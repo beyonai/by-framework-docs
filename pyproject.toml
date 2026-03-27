@@ -1,0 +1,13 @@
+[project]
+name = "by-framework-samples"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "python/workers/langgraph-worker",
+    "python/workers/adk-worker",
+]
