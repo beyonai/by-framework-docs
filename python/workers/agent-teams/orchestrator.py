@@ -130,7 +130,10 @@ class HierarchicalOrchestrator(GatewayWorker):
                 tool_messages = []
                 for i, r in enumerate(results):
                     res_val = str(r.get("reply_data", "No data"))
-                    await context.emit_chunk(f"\n📥 专家 {i+1} 反馈：\n{res_val}\n", content_type="text")
+                    # 前端缩略展示：仅展示前 200 字
+                    display_val = res_val[:200] + "..." if len(res_val) > 200 else res_val
+                    await context.emit_chunk(f"\n📥 专家 {i+1} 反馈 (摘要)：\n{display_val}\n", content_type="text")
+                    # 传给历史记录的必须是完整原稿 res_val
                     tool_messages.append(ToolMessage(content=res_val, tool_call_id=f"ptc_{i}"))
                 
                 history = [
@@ -140,7 +143,10 @@ class HierarchicalOrchestrator(GatewayWorker):
                     HumanMessage(content="请根据以上反馈生成最终方案。")
                 ]
             else:
-                await context.emit_chunk(f"\n📥 专家反馈：\n{command.reply_data}\n", content_type="text")
+                res_val = str(command.reply_data)
+                # 前端缩略展示：仅展示前 200 字
+                display_val = res_val[:200] + "..." if len(res_val) > 200 else res_val
+                await context.emit_chunk(f"\n📥 专家反馈 (摘要)：\n{display_val}\n", content_type="text")
                 history = [
                     HumanMessage(content=str(command.content)),
                     AIMessage(content="Step coordination.", tool_calls=[{"name":"sc","id":"s1","args":{}}]),
