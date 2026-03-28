@@ -9,7 +9,8 @@
 ├── python
 │   └── workers
 │       ├── adk-worker         # 基础 Worker 示例
-│       └── langgraph-worker   # 集成 LangGraph 的 Worker 示例 (支持流式输出)
+│       ├── langgraph-worker   # 集成 LangGraph 的 Worker 示例 (支持流式输出)
+│       └── multi-workers      # 多进程分布式流式协作示例 (Orchestrator + Poet)
 ├── java                       # (待补充 Java Worker 示例)
 └── pyproject.toml             # uv 工作区配置
 ```
@@ -61,6 +62,14 @@ uv run python main.py
 - **能力注册**: 自动注册 `langgraph-agent` 能力。
 - **流式输出**: 集成 `graph.astream` 与 `AgentContext.emit_chunk`，支持向前端实时推送 Token。
 - **配置化**: 支持通过环境变量灵活调整参数。
+
+### Multi-Workers (分布式流式协作)
+
+该示例展示了 `by-framework` 在多进程环境下的分布式调度与实时同步能力：
+
+- **Orchestrator (进程 A)**: 跨进程任务分发。当 LLM 决策需要文学创作时，调度远程诗人。
+- **Poet Sub-Worker (进程 B)**: 分布式诗人节点。生成的诗句通过 `emit_chunk` 跨进程即时推送到同一个 Session 的客户端。
+- **状态同步**: 完美结合 `ResumeCommand` 机制，展示跨 Worker 的控制流闭环。
 
 ## 常见问题
 
