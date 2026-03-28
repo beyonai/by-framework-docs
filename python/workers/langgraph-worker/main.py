@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 from by_framework.core.protocol.commands import GatewayCommand
 from by_framework.worker import AgentContext, GatewayWorker, run_worker
+from by_framework.core.runtime.history import ByClawHistoryBackend
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph import StateGraph, add_messages
@@ -60,6 +61,8 @@ class LangGraphWorker(GatewayWorker):
         # 2. 构建并运行图
         graph = self._build_graph()
 
+        history = await context.agent_runtime_state.session_manager.history.get_history()
+
         full_response = ""
         # 3. 使用 astream 获取流式输出
         async for event in graph.astream(initial_state, stream_mode="messages"):
@@ -67,7 +70,7 @@ class LangGraphWorker(GatewayWorker):
             if message.content:
                 full_response += message.content
                 # 通过 context.emit_chunk 发送流式分片到前端
-                await context.emit_chunk(message.content)
+                await context.emit_chunk(message.content, content_type="1002")
 
         return full_response
 
@@ -83,4 +86,5 @@ if __name__ == "__main__":
         redis_db=int(os.getenv("BYAI_REDIS_DB", 0)),
         redis_username=os.getenv("BYAI_REDIS_USERNAME"),
         redis_password=os.getenv("BYAI_REDIS_PASSWORD"),
+        history_backend=ByClawHistoryBackend(base_url="http://10.45.134.185:8086")
     )

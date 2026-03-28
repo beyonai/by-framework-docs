@@ -1,7 +1,11 @@
 [project]
-name = "adk-worker"
+name = "byai-client-sample"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "python-dotenv>=1.2.2",
+    "redis>=7.4.0",
+    "by-framework",
+]

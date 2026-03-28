@@ -10,3 +10,6 @@ dependencies = [
     "langchain-openai>=0.1.0",
     "python-dotenv>=1.0.0",
 ]
+
+[tool.uv.sources]
+by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/byclaw-gateway-sdk-python" }

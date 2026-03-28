@@ -10,4 +10,8 @@ dependencies = []
 members = [
     "python/workers/langgraph-worker",
     "python/workers/adk-worker",
+    "python/client",
 ]
+
+[tool.uv.sources]
+by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/byclaw-gateway-sdk-python" }
