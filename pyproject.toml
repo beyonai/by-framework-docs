@@ -12,6 +12,7 @@ members = [
     "python/workers/adk-worker",
     "python/client",
     "python/workers/multi-agent-sample",
+    "python/workers/agent-teams",
 ]
 
 [tool.uv.sources]
