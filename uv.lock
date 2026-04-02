@@ -8,6 +8,7 @@ members = [
     "agent-teams",
     "by-discovery-sample",
     "by-framework-samples",
+    "by-plugins-sample",
     "byai-client-sample",
     "langgraph-worker",
     "multi-workers",
@@ -109,6 +110,21 @@ provides-extras = ["dev", "postgres"]
 name = "by-framework-samples"
 version = "0.1.0"
 source = { virtual = "." }
+
+[[package]]
+name = "by-plugins-sample"
+version = "0.1.0"
+source = { virtual = "python/plugins" }
+dependencies = [
+    { name = "by-framework" },
+    { name = "langchain-core" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "by-framework", directory = "../byclaw-gateway-sdk-python" },
+    { name = "langchain-core", specifier = ">=0.1.0" },
+]
 
 [[package]]
 name = "byai-client-sample"
