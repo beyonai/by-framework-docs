@@ -11,7 +11,7 @@ members = [
     "python/workers/langgraph-worker",
     "python/workers/adk-worker",
     "python/client",
-    "python/workers/multi-agent-sample",
+    "python/workers/multi-workers",
     "python/workers/agent-teams",
 ]
 

@@ -66,3 +66,7 @@ Thumbs.db
 *gateway-sdk.log*
 .claude/settings.local.json
 .claude/settings.json
+
+target/
+# Java
+java/target/

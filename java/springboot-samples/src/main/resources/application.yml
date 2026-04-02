@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: springboot-sample-service
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.iwhaleai.byai.gateway.sdk: DEBUG
+    com.beyonai.byframework.samples.springboot: INFO
