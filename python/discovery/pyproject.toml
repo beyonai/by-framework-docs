@@ -1,0 +1,11 @@
+[project]
+name = "by-discovery-sample"
+version = "0.1.0"
+description = "Service Discovery Examples for By-Framework"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "redis>=7.0.0",
+    "by-framework",
+    "python-dotenv>=1.0.1",
+]

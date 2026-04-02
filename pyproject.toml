@@ -13,6 +13,7 @@ members = [
     "python/client",
     "python/workers/multi-workers",
     "python/workers/agent-teams",
+    "python/discovery",
 ]
 
 [tool.uv.sources]
