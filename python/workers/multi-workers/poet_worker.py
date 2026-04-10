@@ -15,7 +15,7 @@ class PoetWorker(GatewayWorker):
     具备 LLM 能力，专注于根据主题进行流式诗歌创作。
     """
 
-    def get_capabilities(self):
+    def get_agent_types(self):
         return ["poet-agent"]
 
     def _get_llm(self):

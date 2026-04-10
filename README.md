@@ -9,6 +9,7 @@
 ├── python
 │   └── workers
 │       ├── adk-worker         # 基础 Worker 示例
+│       ├── filestore-worker   # 接入 byclaw-qa filestore 的 Worker 示例
 │       ├── langgraph-worker   # 集成 LangGraph 的 Worker 示例 (支持流式输出)
 │       └── multi-workers      # 多进程分布式流式协作示例 (Orchestrator + Poet)
 ├── java                       # (待补充 Java Worker 示例)
@@ -22,6 +23,7 @@
 - **Python**: 3.12+ (推荐使用 `uv` 管理)
 - **Redis**: 用于任务队列和心跳注册。
 - **OpenAI API Key**: (仅 `langgraph-worker` 需要)
+- **Byclaw QA 配置**: (仅 `filestore-worker` 需要)
 
 ### 2. 安装依赖
 
@@ -45,6 +47,16 @@ cp .env.example .env
 # OPENAI_API_KEY=...
 ```
 
+`filestore-worker` 需要额外配置：
+
+```bash
+cd python/workers/filestore-worker
+# 设置：
+# BYCLAW_QA_BASE_URL=...
+# BYCLAW_QA_KB_CODE=...
+# BYCLAW_QA_API_KEY=...   # 可选
+```
+
 ### 4. 启动 Worker
 
 在 Worker 目录下执行：
@@ -62,6 +74,22 @@ uv run python main.py
 - **能力注册**: 自动注册 `langgraph-agent` 能力。
 - **流式输出**: 集成 `graph.astream` 与 `AgentContext.emit_chunk`，支持向前端实时推送 Token。
 - **配置化**: 支持通过环境变量灵活调整参数。
+
+### Filestore Worker
+
+该示例展示了如何把 `by-framework-filestore-byclaw-qa` 与 `by-framework-filestore-minio` 的能力接入到标准 `run_worker` 启动流程中：
+
+- **远端文件读写**: 通过 `ByclawQaMarkdownFileStorage` 将文件操作映射到 `byclaw-qa` 服务。
+- **统一 Worker 启动**: 仍然使用 `run_worker(...)` 启动，不需要自定义 Runner。
+- **简化请求模型**: 支持 `write`、`read`、`url` 三类最小请求，便于验证 filestore 能力是否接通。
+
+### History Worker
+
+该示例展示了如何把 history backend 作为 `run_worker(...)` 的可插拔能力接入 LangGraph Worker：
+
+- **多后端切换**: 支持 `in_memory`、`byclaw`、`postgres`
+- **历史注入 Prompt**: Worker 会读取最近会话历史并注入到 LangGraph 提示词
+- **保持统一启动方式**: 仍然通过 `run_worker(...)` 传入 `history_backend`
 
 ### Multi-Workers (分布式流式协作)
 

@@ -1,0 +1,13 @@
+[project]
+name = "claude-agent-worker"
+version = "0.1.0"
+description = "Claude Agent SDK integrated as a by-framework Worker with Agent Teams support"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "python-dotenv>=1.2.2",
+    "redis>=7.4.0",
+    "by-framework",
+    "by-framework-history-postgres",
+    "claude-agent-sdk>=0.1.0",
+]

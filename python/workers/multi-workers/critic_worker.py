@@ -15,7 +15,7 @@ class CriticWorker(GatewayWorker):
     具备 LLM 能力，专注于对文学作品进行风格、意蕴和艺术水平的专业点评。
     """
 
-    def get_capabilities(self):
+    def get_agent_types(self):
         return ["critic-agent"]
 
     def _get_llm(self):

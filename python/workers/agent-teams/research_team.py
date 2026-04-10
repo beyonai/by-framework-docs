@@ -15,7 +15,7 @@ class ResearchTeamWorker(GatewayWorker):
     研究专家团队 - 直接通过大模型生成调研报告。
     """
 
-    def get_capabilities(self) -> List[str]:
+    def get_agent_types(self) -> List[str]:
         return ["research-team-supervisor"]
 
     def _get_llm(self):

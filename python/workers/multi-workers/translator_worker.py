@@ -15,7 +15,7 @@ class TranslatorWorker(GatewayWorker):
     具备 LLM 能力，专注于将中文诗歌翻译为优雅的英文。
     """
 
-    def get_capabilities(self):
+    def get_agent_types(self):
         return ["translator-agent"]
 
     def _get_llm(self):

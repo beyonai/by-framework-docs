@@ -8,14 +8,20 @@ dependencies = []
 
 [tool.uv.workspace]
 members = [
-    "python/workers/langgraph-worker",
-    "python/workers/adk-worker",
     "python/client",
+    "python/workers/langgraph-worker",
+    "python/workers/history-worker",
+    "python/workers/adk-worker",
+    "python/workers/claude-agent",
     "python/workers/multi-workers",
     "python/workers/agent-teams",
+    "python/workers/langgraph-file-worker",
     "python/discovery",
     "python/plugins",
 ]
 
 [tool.uv.sources]
-by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/byclaw-gateway-sdk-python" }
+by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python", editable = true }
+by-framework-filestore-minio = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-filestore-minio", editable = true }
+by-framework-history-byclaw = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-byclaw", editable = true }
+by-framework-history-postgres = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-postgres", editable = true }

@@ -6,10 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "by-framework>=0.1.2",
+    "by-framework-history-byclaw",
     "langgraph>=0.2.0",
     "langchain-openai>=0.1.0",
     "python-dotenv>=1.0.0",
 ]
-
-[tool.uv.sources]
-by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/byclaw-gateway-sdk-python" }

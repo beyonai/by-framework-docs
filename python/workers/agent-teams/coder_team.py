@@ -15,7 +15,7 @@ class CoderTeamWorker(GatewayWorker):
     编码专家团队 - 直接通过大模型生成代码。
     """
 
-    def get_capabilities(self) -> List[str]:
+    def get_agent_types(self) -> List[str]:
         return ["coder-team-supervisor"]
 
     def _get_llm(self):
@@ -54,5 +54,20 @@ class CoderTeamWorker(GatewayWorker):
         # 3. 返回最终完整结果给 Orchestrator
         return full_response
 
+import argparse
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def main():
+    parser = argparse.ArgumentParser(description="Coder Team Worker")
+    parser.add_argument("--worker-id", default="coder-team-1", help="Specify the worker ID")
+    args = parser.parse_args()
+    run_worker(CoderTeamWorker, worker_id=args.worker_id,         redis_host=os.getenv("BYAI_REDIS_HOST", "127.0.0.1"),
+        redis_port=int(os.getenv("BYAI_REDIS_PORT", 6379)),
+        redis_db=int(os.getenv("BYAI_REDIS_DB", 0)),
+        redis_username=os.getenv("BYAI_REDIS_USERNAME"),
+        redis_password=os.getenv("BYAI_REDIS_PASSWORD"),)
+
 if __name__ == "__main__":
-    run_worker(CoderTeamWorker, worker_id="coder-team-1")
+    main()

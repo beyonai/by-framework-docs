@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from by_framework.core.protocol.commands import GatewayCommand
 from by_framework.worker import AgentContext, GatewayWorker, run_worker
-from by_framework.core.runtime.history import ByClawHistoryBackend
+from by_framework_history_byclaw import ByClawHistoryBackend
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, HumanMessage
 from langgraph.graph import StateGraph, add_messages
@@ -23,7 +23,7 @@ class LangGraphWorker(GatewayWorker):
     基于 LangGraph 实现的 Gateway Worker 示例。
     """
 
-    def get_capabilities(self) -> List[str]:
+    def get_agent_types(self) -> List[str]:
         """返回此 Worker 支持的智能体类型列表。"""
         return ["langgraph-agent"]
 
