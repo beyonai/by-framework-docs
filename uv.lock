@@ -139,7 +139,7 @@ requires-dist = [
 
 [[package]]
 name = "by-framework"
-version = "0.1.8"
+version = "0.1.9"
 source = { editable = "../by-framework-python" }
 dependencies = [
     { name = "httpx" },

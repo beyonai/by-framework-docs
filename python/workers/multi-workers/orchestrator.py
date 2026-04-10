@@ -17,6 +17,8 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import BaseMessage, HumanMessage, ToolMessage, AIMessage
 from langchain_core.tools import tool, InjectedToolCallId
 
+from plugin import LoggingPlugin
+
 # 加载环境变量
 load_dotenv()
 
@@ -314,5 +316,6 @@ if __name__ == "__main__":
         redis_port=int(os.getenv("BYAI_REDIS_PORT", 6379)),
         redis_db=int(os.getenv("BYAI_REDIS_DB", 0)),
         redis_username=os.getenv("BYAI_REDIS_USERNAME"),
-        redis_password=os.getenv("BYAI_REDIS_PASSWORD")
+        redis_password=os.getenv("BYAI_REDIS_PASSWORD"),
+        plugin_list=[LoggingPlugin()]
     )

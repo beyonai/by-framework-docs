@@ -1,21 +1,35 @@
 import os
-import asyncio
-from typing import Annotated, Any, List
+import json
+from typing import Any, List, Literal
 from dotenv import load_dotenv
+from prompting import build_file_agent_system_prompt
 
 from by_framework.core.protocol.commands import GatewayCommand
 from by_framework.core.protocol.events import StreamChunkEvent
 from by_framework.worker import AgentContext, GatewayWorker, run_worker
-from by_framework.core.runtime.file_manager import LocalFileStorage
+from by_framework.core.runtime.filestore.local import LocalFileStorage
 from by_framework_history_byclaw import ByClawHistoryBackend
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import BaseMessage, HumanMessage
-from langgraph.graph import StateGraph, add_messages
 from langgraph.prebuilt import create_react_agent
 from langchain_core.tools import tool
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
+
+
+ScopeName = Literal["private", "shared"]
+
+
+def format_path_entries(entries: list[dict[str, Any]]) -> str:
+    """Render structured path entries for human-readable tool output."""
+
+    return "\n".join(
+        "{path} ({absolute_path})".format(
+            path=entry.get("path", ""),
+            absolute_path=entry.get("absolute_path", ""),
+        ).strip()
+        for entry in entries
+    )
 
 
 class LangGraphFileWorker(GatewayWorker):
@@ -34,40 +48,73 @@ class LangGraphFileWorker(GatewayWorker):
         """处理来自 Gateway 的命令。"""
         self.logger.info(f"Processing command: {command.header.message_id}")
 
-        file_manager = context.agent_runtime_state.session_manager.file_manager
-        session_id = file_manager.session_id
+        session_manager = context.agent_runtime_state.session_manager
+        session_id = session_manager.file_manager.session_id
+        system_prompt = build_file_agent_system_prompt(session_id)
 
-        # --- 将文件管理 API 包装成 LangChain Tools ---
-        @tool(description="""Read content from a file in the workspace.
+        def get_file_manager(scope: ScopeName):
+            if scope == "shared":
+                return session_manager.shared_file_manager
+            return session_manager.private_file_manager
+
+        @tool(name_or_callable="read_file", description="""Read content from a file.
             - Your session_id is: {session_id}
             - Example path: sessions/{session_id}/file.txt
             - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
             - Traversal: '../' is prohibited.
             - Images: Returns metadata (type, base64) for common image extensions.
             """.format(session_id=session_id))
-        async def read_file(filename: str, offset: int = 0, limit: int | None = None, encoding: str = "utf-8") -> str:
+        async def read_file(
+            filename: str,
+            scope: ScopeName = "private",
+            offset: int = 0,
+            limit: int | None = None,
+            encoding: str = "utf-8",
+        ) -> str:
+            file_manager = get_file_manager(scope)
             try:
-                response = await file_manager.read_file(filename, offset=offset, limit=limit, encoding=encoding)
+                response = await file_manager.read_file(
+                    filename,
+                    offset=offset,
+                    limit=limit,
+                    encoding=encoding,
+                )
                 if response["success"]:
                     data = response["data"]
                     if isinstance(data, dict):
-                        import json
-                        return f"SUCCESS (Media Detached): {json.dumps(data, ensure_ascii=False)}"
+                        return json.dumps(data, ensure_ascii=False, indent=2)
                     return str(data)
                 return f"Error: {response['error']}"
             except Exception as e:
                 return f"Failed to read file: {e}"
 
-        @tool(description="""Edit a file by replacing a substring.
+        @tool(name_or_callable="edit_file", description="""Edit a file by replacing a substring.
             - Your session_id is: {session_id}
             - Example path: sessions/{session_id}/file.txt
             - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
             Use this for selective modifications. 'old_string' must match exactly.
-            - Success response includes the number of occurrences replaced.
             """.format(session_id=session_id))
-        async def edit_file(filename: str, old_string: str, new_string: str, replace_all: bool = False, encoding: str = "utf-8") -> str:
+        async def edit_file(
+            filename: str,
+            old_string: str,
+            new_string: str,
+            scope: ScopeName = "private",
+            replace_all: bool = False,
+            encoding: str = "utf-8",
+        ) -> str:
+            file_manager = get_file_manager(scope)
             try:
-                response = await file_manager.edit_file(filename, old_string, new_string, replace_all=replace_all, encoding=encoding)
+                response = await file_manager.edit_file(
+                    filename,
+                    old_string,
+                    new_string,
+                    replace_all=replace_all,
+                    encoding=encoding,
+                )
                 if response["success"]:
                     occurrences = response["data"].get("occurrences", 0)
                     return f"{response['message']} (Replaced {occurrences} occurrences)"
@@ -75,90 +122,153 @@ class LangGraphFileWorker(GatewayWorker):
             except Exception as e:
                 return f"Failed to edit file: {e}"
 
-        @tool(description="""Search for 'pattern' in files within the sandboxed workspace.
+        @tool(name_or_callable="grep_files", description="""Search for text in files.
             - Your session_id is: {session_id}
-            - ONLY these root paths are allowed:
-              * sessions/{session_id}/   (your private session files)
-              * public/                   (shared public files)
-            - glob_pattern MUST start with one of the above roots, e.g., 'sessions/{session_id}/*.py' or 'public/*.md'
-            - DO NOT use absolute paths or paths outside these roots.
+            - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
+            - Use output_mode='files_with_matches' when you want to save tokens and inspect matching files later with read_file.
             """.format(session_id=session_id))
-        async def grep_files(pattern: str, glob_pattern: str = "*") -> str:
+        async def grep_files(
+            pattern: str,
+            scope: ScopeName = "private",
+            glob_pattern: str = "*",
+            output_mode: str = "content",
+        ) -> str:
+            file_manager = get_file_manager(scope)
             try:
-                response = await file_manager.grep_files(pattern, glob_pattern)
+                response = await file_manager.grep_files(
+                    pattern,
+                    glob_pattern,
+                    output_mode=output_mode,
+                )
                 if response["success"]:
-                    matches = response["data"]
-                    if not matches:
+                    data = response["data"]
+                    if isinstance(data, dict) and data.get("evicted"):
+                        return (
+                            f"{response['message']}\n"
+                            f"Preview: {data.get('preview', '')}\n"
+                            f"Full results stored at: {data.get('path', '')}\n"
+                            f"Absolute path: {data.get('absolute_path', '')}"
+                        )
+                    if not data:
                         return "No matches found."
-                    result = []
-                    for m in matches:
-                        result.append(f"{m['file']}:{m['line_number']}: {m['content']}")
-                    return f"Found {len(matches)} matches:\n" + "\n".join(result)
+                    if output_mode == "files_with_matches":
+                        return format_path_entries(data)
+                    if output_mode == "count":
+                        return json.dumps(data, ensure_ascii=False, indent=2)
+                    return "Found {count} matches:\n{lines}".format(
+                        count=len(data),
+                        lines="\n".join(
+                            f"{match['path']}:{match['line_number']}: {match['content']} ({match.get('absolute_path', '')})"
+                            for match in data
+                        ),
+                    )
                 return f"Error: {response['error']}"
             except Exception as e:
                 return f"Failed to search files: {e}"
 
-        @tool(description="""Write content to a file in the workspace.
+        @tool(name_or_callable="write_file", description="""Write content to a file.
             - Your session_id is: {session_id}
-            - Example path: sessions/{session_id}/file.txt
             - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
-            - Traversal: '../' is prohibited.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
             """.format(session_id=session_id))
-        async def write_file(filename: str, content: str, encoding: str = "utf-8") -> str:
+        async def write_file(
+            filename: str,
+            content: str,
+            scope: ScopeName = "private",
+            encoding: str = "utf-8",
+        ) -> str:
+            file_manager = get_file_manager(scope)
             try:
-                response = await file_manager.write_file(filename, content, encoding=encoding)
+                response = await file_manager.write_file(
+                    filename,
+                    content,
+                    encoding=encoding,
+                )
                 if response["success"]:
+                    details = response.get("data", {})
+                    bytes_written = details.get("bytes_written")
+                    if bytes_written is not None:
+                        return f"{response['message']} ({bytes_written} bytes written)"
                     return response["message"]
                 return f"Error: {response['error']}"
             except Exception as e:
                 return f"Failed to write file: {e}"
 
-        @tool(description="""List files and directories in the sandboxed workspace.
+        @tool(name_or_callable="list_files", description="""List files and directories.
             - Your session_id is: {session_id}
-            - ONLY these root paths are allowed:
-              * sessions/{session_id}/   (your private session files)
-              * public/                   (shared public files)
-            - directory MUST start with 'sessions/{session_id}/' or be 'public/' or empty for root
-            - Examples: 'sessions/{session_id}', 'sessions/{session_id}/subdir', 'public', ''
+            - Path prefix: Must start with 'sessions/{session_id}/' or 'public/' or be empty for root.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
             """.format(session_id=session_id))
-        async def list_files(directory: str = "") -> str:
+        async def list_files(directory: str = "", scope: ScopeName = "private") -> str:
+            file_manager = get_file_manager(scope)
             try:
                 response = await file_manager.list_files(directory)
                 if response["success"]:
                     items = response["data"]
                     if not items:
                         return "(Empty directory)"
-                    return "\n".join(items)
+                    return format_path_entries(items)
                 return f"Error: {response['error']}"
             except Exception as e:
                 return f"Failed to list files: {e}"
 
-        @tool(description="""Find files matching a glob pattern in the sandboxed workspace.
+        @tool(name_or_callable="delete_file", description="""Delete a file or directory.
             - Your session_id is: {session_id}
-            - ONLY these root paths are allowed:
-              * sessions/{session_id}/   (your private session files)
-              * public/                   (shared public files)
-            - pattern MUST start with one of the above roots, e.g., 'sessions/{session_id}/**/*.py' or 'public/**/*.md'
-            - Supports * (single dir) and ** (recursive).
-            - DO NOT use absolute paths or paths outside these roots.
+            - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
             """.format(session_id=session_id))
-        async def glob_files(pattern: str) -> str:
+        async def delete_file(filename: str, scope: ScopeName = "private") -> str:
+            file_manager = get_file_manager(scope)
+            try:
+                response = await file_manager.delete_file(filename)
+                if response["success"]:
+                    return response["message"]
+                return f"Error: {response['error']}"
+            except Exception as e:
+                return f"Failed to delete file: {e}"
+
+        @tool(name_or_callable="glob_files", description="""Find files matching a glob pattern.
+            - Your session_id is: {session_id}
+            - Path prefix: Must start with 'sessions/{session_id}/' or 'public/'.
+            - Use scope='private' by default.
+            - Use scope='shared' only for cross-agent shared files.
+            - Supports * (single dir) and ** (recursive).
+            """.format(session_id=session_id))
+        async def glob_files(pattern: str, scope: ScopeName = "private") -> str:
+            file_manager = get_file_manager(scope)
             try:
                 response = await file_manager.glob_files(pattern)
                 if response["success"]:
                     data = response["data"]
-                    # Handle evicted response (large results stored to file)
                     if isinstance(data, dict) and data.get("evicted"):
-                        return f"{response['message']}\nPreview: {data.get('preview', '')}\nFull results stored at: {data.get('path', '')}"
+                        return (
+                            f"{response['message']}\n"
+                            f"Preview: {data.get('preview', '')}\n"
+                            f"Full results stored at: {data.get('path', '')}\n"
+                            f"Absolute path: {data.get('absolute_path', '')}"
+                        )
                     items = data if isinstance(data, list) else []
                     if not items:
                         return "No files matched the pattern."
-                    return "\n".join(items)
+                    return format_path_entries(items)
                 return f"Error: {response['error']}"
             except Exception as e:
                 return f"Failed to glob files: {e}"
 
-        tools = [read_file, edit_file, grep_files, write_file, list_files, glob_files]
+        tools = [
+            read_file,
+            edit_file,
+            grep_files,
+            write_file,
+            list_files,
+            glob_files,
+            delete_file,
+        ]
 
         # 获取 LLM
         llm = ChatOpenAI(
@@ -184,6 +294,8 @@ class LangGraphFileWorker(GatewayWorker):
         #     elif role == "assistant":
         #         messages.append(("ai", content))
                 
+        messages.append(("system", system_prompt))
+
         # 加上当前用户的新内容
         messages.append(("human", str(command.content)))
 
@@ -202,7 +314,6 @@ class LangGraphFileWorker(GatewayWorker):
             elif kind == "on_tool_start":
                 tool_name = event["name"]
                 tool_input = event["data"].get("input")
-                import json
                 chunk_event = StreamChunkEvent(
                     tool_calls=[{
                         "id": event.get("run_id", "local_call"),
