@@ -1,6 +1,6 @@
 package com.beyonai.byframework.samples.springboot.controller;
 
-import com.iwhaleai.byai.gateway.sdk.core.discovery.ServiceRegistry;
+import com.iwhaleai.byai.framework.core.discovery.ServiceRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

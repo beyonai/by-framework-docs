@@ -1,14 +1,14 @@
 package com.beyonai.byframework.samples.examples;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iwhaleai.byai.gateway.sdk.client.GatewayClient;
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.GatewayCommand;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.GatewayCommandFactory;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.MessageHeader;
-import com.iwhaleai.byai.gateway.sdk.worker.AgentContext;
-import com.iwhaleai.byai.gateway.sdk.worker.GatewayWorker;
-import com.iwhaleai.byai.gateway.sdk.worker.WorkerRunner;
+import com.iwhaleai.byai.framework.client.GatewayClient;
+import com.iwhaleai.byai.framework.common.RedisClient;
+import com.iwhaleai.byai.framework.core.protocol.GatewayCommand;
+import com.iwhaleai.byai.framework.core.protocol.GatewayCommandFactory;
+import com.iwhaleai.byai.framework.core.protocol.MessageHeader;
+import com.iwhaleai.byai.framework.worker.AgentContext;
+import com.iwhaleai.byai.framework.worker.GatewayWorker;
+import com.iwhaleai.byai.framework.worker.WorkerRunner;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -73,7 +73,7 @@ public class CustomCommandExample {
         }
 
         @Override
-        public List<String> getCapabilities() {
+        public List<String> getAgentTypes() {
             return List.of(CAPABILITY);
         }
 

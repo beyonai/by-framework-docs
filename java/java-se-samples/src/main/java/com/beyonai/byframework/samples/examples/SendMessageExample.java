@@ -1,9 +1,9 @@
 package com.beyonai.byframework.samples.examples;
 
-import com.iwhaleai.byai.gateway.sdk.client.ByaiGatewayClient;
-import com.iwhaleai.byai.gateway.sdk.client.GatewayClient;
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.ActionType;
+import com.iwhaleai.byai.framework.client.ByaiGatewayClient;
+import com.iwhaleai.byai.framework.client.GatewayClient;
+import com.iwhaleai.byai.framework.common.RedisClient;
+import com.iwhaleai.byai.framework.core.protocol.ActionType;
 
 import java.util.HashMap;
 import java.util.Map;

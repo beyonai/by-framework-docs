@@ -1,12 +1,12 @@
 package com.beyonai.byframework.samples.examples;
 
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.AskAgentCommand;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.CancelTaskCommand;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.GatewayCommand;
-import com.iwhaleai.byai.gateway.sdk.worker.AgentContext;
-import com.iwhaleai.byai.gateway.sdk.worker.GatewayWorker;
-import com.iwhaleai.byai.gateway.sdk.worker.WorkerRunner;
+import com.iwhaleai.byai.framework.common.RedisClient;
+import com.iwhaleai.byai.framework.core.protocol.AskAgentCommand;
+import com.iwhaleai.byai.framework.core.protocol.CancelTaskCommand;
+import com.iwhaleai.byai.framework.core.protocol.GatewayCommand;
+import com.iwhaleai.byai.framework.worker.AgentContext;
+import com.iwhaleai.byai.framework.worker.GatewayWorker;
+import com.iwhaleai.byai.framework.worker.WorkerRunner;
 
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class AdvancedSubscriberExample {
         }
 
         @Override
-        public List<String> getCapabilities() {
+        public List<String> getAgentTypes() {
             return List.of("advanced-java-agent");
         }
 
@@ -65,7 +65,7 @@ public class AdvancedSubscriberExample {
 
                     context.emitChunk("正在处理第 " + i + " 步...\n");
                     System.out.println("    进度: " + i + "/10");
-                    
+
                     try {
                         Thread.sleep(1000); // 模拟耗时操作
                     } catch (InterruptedException e) {
@@ -84,14 +84,14 @@ public class AdvancedSubscriberExample {
 
     public static void main(String[] args) {
         System.out.println("=== Java SDK 高级功能演示 (Pub/Sub + 取消机制) ===");
-        
+
         // 环境变量读取 Redis 配置 (REDIS_HOST, REDIS_PORT, etc.)
         RedisClient redisClient = RedisClient.getInstance();
         MyAdvancedWorker worker = new MyAdvancedWorker("advanced-worker-001");
-        
+
         // WorkerRunner 内部会自动监听能力流和 Worker 专属控制流
         WorkerRunner runner = new WorkerRunner(worker, redisClient, "java-advanced-group");
-        
+
         System.out.println("[*] 正在启动 Runner...");
         runner.start();
 
@@ -100,7 +100,7 @@ public class AdvancedSubscriberExample {
             runner.stop();
             redisClient.close();
         }));
-        
+
         System.out.println("[*] 运行中。按 Ctrl+C 停止。");
     }
 }

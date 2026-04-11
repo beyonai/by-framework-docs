@@ -1,10 +1,10 @@
 package com.beyonai.byframework.samples.examples;
 
-import com.iwhaleai.byai.gateway.sdk.core.protocol.AskAgentCommand;
-import com.iwhaleai.byai.gateway.sdk.core.protocol.GatewayCommand;
-import com.iwhaleai.byai.gateway.sdk.worker.AgentContext;
-import com.iwhaleai.byai.gateway.sdk.worker.GatewayWorker;
-import com.iwhaleai.byai.gateway.sdk.worker.WorkerRunner;
+import com.iwhaleai.byai.framework.core.protocol.AskAgentCommand;
+import com.iwhaleai.byai.framework.core.protocol.GatewayCommand;
+import com.iwhaleai.byai.framework.worker.AgentContext;
+import com.iwhaleai.byai.framework.worker.GatewayWorker;
+import com.iwhaleai.byai.framework.worker.WorkerRunner;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public class DemoWorker extends GatewayWorker {
     }
 
     @Override
-    public List<String> getCapabilities() {
+    public List<String> getAgentTypes() {
         return List.of("java-agent-demo");
     }
 
@@ -29,7 +29,7 @@ public class DemoWorker extends GatewayWorker {
 
         context.emitState("Thinking...");
         context.emitChunk("Hello from Java SDK! I received your message: " + askAgentCommand.content());
-        
+
         return "Task processed by Java";
     }
 
@@ -37,7 +37,7 @@ public class DemoWorker extends GatewayWorker {
         DemoWorker worker = new DemoWorker("java-worker-001");
         WorkerRunner runner = new WorkerRunner(worker);
         runner.start();
-        
+
         Runtime.getRuntime().addShutdownHook(new Thread(runner::stop));
     }
 }

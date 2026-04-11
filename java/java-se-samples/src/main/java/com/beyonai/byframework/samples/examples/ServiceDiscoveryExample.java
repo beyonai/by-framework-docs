@@ -1,8 +1,8 @@
 package com.beyonai.byframework.samples.examples;
 
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
-import com.iwhaleai.byai.gateway.sdk.core.discovery.DiscoveryClient;
-import com.iwhaleai.byai.gateway.sdk.core.discovery.ServiceInstance;
+import com.iwhaleai.byai.framework.common.RedisClient;
+import com.iwhaleai.byai.framework.core.discovery.DiscoveryClient;
+import com.iwhaleai.byai.framework.core.discovery.ServiceInstance;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.beyonai.byframework.samples.springboot.config;
 
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
-import com.iwhaleai.byai.gateway.sdk.core.discovery.ServiceRegistry;
-import com.iwhaleai.byai.gateway.sdk.config.GatewayConfig;
+import com.iwhaleai.byai.framework.common.RedisClient;
+import com.iwhaleai.byai.framework.core.discovery.ServiceRegistry;
+import com.iwhaleai.byai.framework.config.GatewayConfig;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,9 +21,9 @@ import java.util.Map;
  * 改进点：
  * 1. 动态端口捕获：支持 server.port=0 情况，监听 ServletWebServerInitializedEvent 获取真实端口。
  * 2. 显式生命周期管理：解决 DevTools 重启导致的 "Pool not open" 问题。
- *    原因：RedisClient 在 SDK 中是静态单例，Spring 销毁旧 Context 时会关闭连接池，
- *    重启后的新 Context 获取到的仍是旧的已关闭单例。
- *    解决方法：通过 RedisClient.init() 强制重新初始化。
+ * 原因：RedisClient 在 SDK 中是静态单例，Spring 销毁旧 Context 时会关闭连接池，
+ * 重启后的新 Context 获取到的仍是旧的已关闭单例。
+ * 解决方法：通过 RedisClient.init() 强制重新初始化。
  * 3. 灵活网络配置：引入 gateway.discovery.host 支持手动指定注册 Host，适配 Docker/NAT 环境。
  */
 @Slf4j
@@ -58,8 +58,7 @@ public class GatewayDiscoveryConfiguration implements ApplicationListener<Servle
                 GatewayConfig.getInt("gateway.redis.db", 0),
                 GatewayConfig.get("gateway.redis.username"),
                 GatewayConfig.get("gateway.redis.password"),
-                GatewayConfig.getInt("gateway.redis.timeout", 5000)
-        );
+                GatewayConfig.getInt("gateway.redis.timeout", 5000));
         return RedisClient.getInstance();
     }
 
@@ -81,9 +80,9 @@ public class GatewayDiscoveryConfiguration implements ApplicationListener<Servle
             metadata.put("framework", "spring-boot");
             metadata.put("version", "3.2.0");
 
-            log.info(">>> 正在向注册中心注册服务: {} (Host: {}, Port: {})", 
-                     serviceName, discoveryHost != null ? discoveryHost : "AUTO", actualServerPort);
-            
+            log.info(">>> 正在向注册中心注册服务: {} (Host: {}, Port: {})",
+                    serviceName, discoveryHost != null ? discoveryHost : "AUTO", actualServerPort);
+
             // 注册服务
             registry.register(serviceName, discoveryHost, actualServerPort, 1, metadata, 5);
             log.info(">>> 服务注册成功，实例 ID: {}", registry.getCurrentInstance().getId());

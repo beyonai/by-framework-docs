@@ -25,7 +25,7 @@
         <!-- SDK Core -->
         <dependency>
             <groupId>com.iwhaleai.byai</groupId>
-            <artifactId>by-framework-java</artifactId>
+            <artifactId>by-framework</artifactId>
         </dependency>
 
         <!-- Lombok -->

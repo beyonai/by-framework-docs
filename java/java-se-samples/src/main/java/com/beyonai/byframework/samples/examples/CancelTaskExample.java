@@ -1,7 +1,7 @@
 package com.beyonai.byframework.samples.examples;
 
-import com.iwhaleai.byai.gateway.sdk.client.GatewayClient;
-import com.iwhaleai.byai.gateway.sdk.common.RedisClient;
+import com.iwhaleai.byai.framework.client.GatewayClient;
+import com.iwhaleai.byai.framework.common.RedisClient;
 
 /**
  * 演示如何通过 Java SDK 发起任务中断。
@@ -24,8 +24,7 @@ public class CancelTaskExample {
                 "manual demo interrupt",
                 "",
                 "java-example",
-                "graceful"
-        );
+                "graceful");
 
         System.out.println("Cancel result: " + result);
         redisClient.close();
