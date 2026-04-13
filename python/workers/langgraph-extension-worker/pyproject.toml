@@ -1,14 +1,15 @@
 [project]
-name = "langgraph-worker"
+name = "langgraph-extension-worker"
 version = "0.1.0"
-description = "Add your description here"
+description = "A demonstration of by-framework-langgraph extension"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "by-framework>=0.1.2",
+    "by-framework",
+    "by-framework-langgraph",
     "by-framework-history-byclaw",
     "langgraph>=1.1.6",
     "langchain-core>=1.2.28",
     "langchain-openai>=1.1.12",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.0.1",
 ]

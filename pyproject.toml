@@ -16,12 +16,14 @@ members = [
     "python/workers/multi-workers",
     "python/workers/agent-teams",
     "python/workers/langgraph-file-worker",
+    "python/workers/langgraph-multimodal-worker",
+    "python/workers/langgraph-extension-worker",
     "python/discovery",
     "python/plugins",
 ]
 
 [tool.uv.sources]
 by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python", editable = true }
-by-framework-filestore-minio = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-filestore-minio", editable = true }
+by-framework-langgraph = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-langgraph", editable = true }
 by-framework-history-byclaw = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-byclaw", editable = true }
 by-framework-history-postgres = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-postgres", editable = true }

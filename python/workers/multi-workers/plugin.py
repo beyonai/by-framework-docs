@@ -63,5 +63,5 @@ class LoggingPlugin(Plugin):
         """
         调用 Agent 开始钩子：记录开始时间。
         """
-        command.header.source_agent_type = ""
+        # command.header.source_agent_type = ""
         logger.info("on_call_agent_start")

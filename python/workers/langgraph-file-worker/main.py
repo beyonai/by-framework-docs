@@ -4,13 +4,18 @@ from typing import Any, List, Literal
 from dotenv import load_dotenv
 from prompting import build_file_agent_system_prompt
 
-from by_framework.core.protocol.commands import GatewayCommand
+from by_framework.core.protocol.commands import (
+    GatewayCommand,
+    AskAgentCommand,
+    ResumeCommand,
+)
 from by_framework.core.protocol.events import StreamChunkEvent
-from by_framework.worker import AgentContext, GatewayWorker, run_worker
+from by_framework.worker import AgentContext, run_worker, ByaiWorker
 from by_framework.core.runtime.filestore.local import LocalFileStorage
-from by_framework_history_byclaw import ByClawHistoryBackend
+from by_framework_history_postgres import PostgresHistoryBackend
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
+from langgraph.checkpoint.memory import MemorySaver
 from langchain_core.tools import tool
 
 # 加载 .env 文件中的环境变量
@@ -32,15 +37,22 @@ def format_path_entries(entries: list[dict[str, Any]]) -> str:
     )
 
 
-class LangGraphFileWorker(GatewayWorker):
+class LangGraphFileWorker(ByaiWorker):
     """
     基于 LangGraph 和 By-Framework 实现的文件管理智能体。
     它将 `file_manager` 包装成了 langgraph 的 tools。
+    支持 checkpoint + 内存存储，实现同 session 的多轮对话记忆。
     """
 
     def get_agent_types(self) -> List[str]:
         """返回此 Worker 支持的智能体类型列表。"""
         return ["langgraph-file-agent"]
+
+    def _get_memory_saver(self) -> MemorySaver:
+        """获取或创建 MemorySaver 单例，用于 checkpoint 持久化。"""
+        if not hasattr(self, "_memory_saver"):
+            self._memory_saver = MemorySaver()
+        return self._memory_saver
 
     async def process_command(
         self, command: GatewayCommand, context: AgentContext
@@ -278,32 +290,49 @@ class LangGraphFileWorker(GatewayWorker):
             streaming=True
         )
 
-        # 构建拥有工具能力的 react agent
-        agent_executor = create_react_agent(llm, tools)
+        # 构建拥有工具能力的 react agent，并挂载 checkpoint
+        # 使用 prompt 注入系统提示词（适配当前版本的 create_react_agent）
+        agent_executor = create_react_agent(
+            llm, 
+            tools, 
+            checkpointer=self._get_memory_saver(),
+            prompt=system_prompt
+        )
 
-        # 因为需要处理多轮上下文，我们从 session 中获取历史
-        # history = await context.agent_runtime_state.session_manager.history.get_history()
-        
-        # 提取历史消息 (简单实现：过滤出 user 和 assistant 的消息)
-        messages = []
-        # for msg in history:
-        #     role = msg.get("role")
-        #     content = msg.get("content")
-        #     if role == "user":
-        #         messages.append(("human", content))
-        #     elif role == "assistant":
-        #         messages.append(("ai", content))
-                
-        messages.append(("system", system_prompt))
+        # 使用 session_id 作为 thread_id，实现同 session 多轮对话记忆
+        config = {"configurable": {"thread_id": context.session_id}}
 
-        # 加上当前用户的新内容
-        messages.append(("human", str(command.content)))
+        if isinstance(command, ResumeCommand):
+            # ResumeCommand：从 checkpoint 恢复中断的任务
+            from langgraph.types import Command as LGCommand
+            resume_data = (
+                str(command.reply_data)
+                if hasattr(command, "reply_data") and command.reply_data
+                else "任务已完成。"
+            )
+            self.logger.info(
+                f"Resume received, waking LangGraph (data length: {len(resume_data)})..."
+            )
+            final = await agent_executor.ainvoke(
+                LGCommand(resume=resume_data), config=config
+            )
+            last_msg = final["messages"][-1]
+            final_answer = (
+                last_msg.content if hasattr(last_msg, "content") else str(last_msg)
+            )
+            if final_answer:
+                await context.emit_chunk(final_answer, content_type="1002")
+            return final_answer or "任务已恢复完成。"
 
-        initial_state = {"messages": messages}
+        # AskAgentCommand 或普通命令：首轮 / 多轮对话
+        # Checkpoint 会自动检索之前的对话历史，我们只需传递当前的新消息
+        initial_state = {"messages": [("human", str(command.content))]}
 
         full_response = ""
-        # 流式执行 graph
-        async for event in agent_executor.astream_events(initial_state, version="v2"):
+        # 流式执行 graph（带 checkpoint config）
+        async for event in agent_executor.astream_events(
+            initial_state, version="v2", config=config
+        ):
             kind = event["event"]
             if kind == "on_chat_model_stream":
                 chunk = event["data"]["chunk"]
@@ -330,7 +359,10 @@ class LangGraphFileWorker(GatewayWorker):
                 tool_output = event["data"].get("output")
                 chunk_event = StreamChunkEvent(
                     role="tool",
-                    content=str(tool_output),
+                    tool_responses=[{
+                        "tool_call_id": event.get("run_id", "local_call"),
+                        "content": str(tool_output)
+                    }],
                     metadata={"tool_name": tool_name}
                 )
                 await context.emit_chunk(chunk_event)
@@ -348,6 +380,6 @@ if __name__ == "__main__":
         redis_db=int(os.getenv("BYAI_REDIS_DB", 0)),
         redis_username=os.getenv("BYAI_REDIS_USERNAME"),
         redis_password=os.getenv("BYAI_REDIS_PASSWORD"),
-        storage=LocalFileStorage(base_dir="/Users/xiaozhongcheng/workspace")
-        # history_backend=ByClawHistoryBackend(base_url="http://10.45.134.185:8086")
+        storage=LocalFileStorage(base_dir="/Users/xiaozhongcheng/workspace"),
+        history_backend=PostgresHistoryBackend(dsn=os.getenv("BYAI_HISTORY_DSN", "postgresql://postgres:postgres@localhost:5432/postgres"))
     )
