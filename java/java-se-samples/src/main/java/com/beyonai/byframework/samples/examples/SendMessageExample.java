@@ -29,7 +29,8 @@ public class SendMessageExample {
         String targetAgentType = "pubsub-capability";
         String sessionId = "session-demo-a-b-a";
         String content = "你好，这是来自 Java SDK 拦截器模式的测试消息。";
-        String tenantId = "tenant-1";
+        String userCode = "user-1";
+        String userName = "测试用户";
 
         // 扩展参数 (可选)
         Map<String, Object> payload = new HashMap<>();
@@ -48,7 +49,8 @@ public class SendMessageExample {
                 targetAgentType,
                 sessionId,
                 content,
-                tenantId,
+                userCode,
+                userName,
                 ActionType.ASK_AGENT,
                 null,
                 null,
