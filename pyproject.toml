@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "langfuse>=4.3.1",
+]
 
 [tool.uv.workspace]
 members = [
@@ -27,3 +29,4 @@ by-framework = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework
 by-framework-langgraph = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-langgraph", editable = true }
 by-framework-history-byclaw = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-byclaw", editable = true }
 by-framework-history-postgres = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-postgres", editable = true }
+by-framework-trace-langfuse = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-trace-langfuse", editable = true }
