@@ -8,7 +8,6 @@ dependencies = [
     "by-framework",
     "by-framework-langgraph",
     "by-framework-history-byclaw",
-    "by-framework-trace-langfuse",
     "langgraph>=1.1.6",
     "langchain-core>=1.2.28",
     "langchain-openai>=1.1.12",

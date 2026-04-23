@@ -151,7 +151,7 @@ requires-dist = [
 
 [[package]]
 name = "by-framework"
-version = "0.1.10"
+version = "0.1.11"
 source = { editable = "../by-framework-python" }
 dependencies = [
     { name = "dill" },
@@ -994,7 +994,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", extras = ["observability"], editable = "../by-framework-python" },
+    { name = "by-framework", editable = "../by-framework-python" },
     { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
