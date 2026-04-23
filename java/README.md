@@ -70,3 +70,30 @@ mvn exec:java -Dexec.mainClass="com.beyonai.byframework.samples.examples.SendMes
 - `java-se-samples/src/main/resources/gateway-config.properties`
 
 > **注意**: 如果遇到鉴权超时，请检查 Redis `username` 和 `password` 是否与本地环境匹配或建议保持为空。
+
+---
+
+## 3. 高级服务发现特性示例 (New)
+
+演示多协议支持、路径前缀以及“不发心跳/不探活”的特殊场景。
+
+### 注册不发心跳的服务：
+适用于静态服务节点，该示例使用 `registerOnly` 接口进行注册。
+```bash
+cd java-se-samples
+mvn exec:java -Dexec.mainClass="com.beyonai.byframework.samples.examples.ServiceRegistryNoHeartbeatExample"
+```
+
+### 发送请求时不进行探活：
+演示如何在调用端通过配置 `healthThresholdMs = -1` (SD_NO_HEALTH_CHECK) 来跳过对目标实例的健康状态检查。
+```bash
+cd java-se-samples
+mvn exec:java -Dexec.mainClass="com.beyonai.byframework.samples.examples.DiscoveryNoLivenessExample"
+```
+
+### 使用 HTTP Client 调用服务（支持协议/前缀）：
+演示 `DiscoveryHttpClient` 如何根据注册信息自动拼接 `protocol://host:port/prefix/path`。
+```bash
+cd java-se-samples
+mvn exec:java -Dexec.mainClass="com.beyonai.byframework.samples.examples.DiscoveryHttpClientExample"
+```
