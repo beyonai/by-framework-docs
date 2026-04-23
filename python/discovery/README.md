@@ -89,6 +89,68 @@ python discovery_http_client_example.py
 > [!TIP]
 > 如果你在运行此示例时没有启动真正的 HTTP 服务（如 Spring Boot 示例中对应的端口），脚本会捕获异常。此示例重点展示了 SDK 的重试逻辑和自动地址转换。
 
+#### 第四步：演示只注册、不发心跳
+
+如果你的服务实例只想写入注册中心，但不希望由 SDK 周期性发送心跳，可以运行下面的示例：
+
+```bash
+python provider_register_only_example.py
+```
+
+*输出示例:*
+```bash
+[*] 正在以 register_only 模式注册服务: demo-service (http://127.0.0.1:8080/)
+[+] 注册完成，本示例不会启动后台心跳。
+[!] 这种模式适合你明确不希望由 SDK 心跳判活的场景。
+```
+
+这个脚本底层调用的是：
+
+```python
+await registry.register_only(
+    service_name="demo-service",
+    host="127.0.0.1",
+    port=8080,
+    protocol="http",
+    path_prefix="/",
+)
+```
+
+#### 第五步：演示请求时关闭心跳健康探测
+
+当实例是通过 `register_only()` 注册的，由于它不会持续刷新心跳时间，调用端就应该显式关闭基于心跳时间的健康探测：
+
+```bash
+python discovery_http_client_no_health_check_example.py
+```
+
+*输出示例:*
+```bash
+[*] 准备调用服务: demo-service
+[*] 本示例会禁用基于心跳时间的健康探测。
+[+] GET 成功: 200
+```
+
+关键写法如下：
+
+```python
+async with DiscoveryHttpClient(
+    discovery_client,
+    retry_config=retry_config,
+    health_threshold_ms=RedisKeys.SD_NO_HEALTH_CHECK,
+) as client:
+    response = await client.get(service_name, "/")
+```
+
+如果你只是想做纯发现，不走 HTTP client，也可以直接这样拿实例：
+
+```python
+instance = await discovery_client.discover(
+    service_name,
+    health_threshold_ms=RedisKeys.SD_NO_HEALTH_CHECK,
+)
+```
+
 ## 核心机制
 
 - **ServiceRegistry**: 负责向 Redis 写入实例详情（HASH）和活跃心跳（ZSET）。如果进程崩溃或未注销，Redis 中的 ZSET 会在心跳超时后判定该实例失效。
@@ -96,9 +158,12 @@ python discovery_http_client_example.py
     - `watch()`: 开启后台异步刷新。
     - `discover(strategy="random")`: 随机策略轮询。
     - `discover(strategy="round-robin")`: 轮询策略。
+    - `discover(..., health_threshold_ms=RedisKeys.SD_NO_HEALTH_CHECK)`: 跳过基于心跳时间的健康过滤。
 - **DiscoveryHttpClient**: 高级 HTTP 客户端，集成了服务发现与**节点切换重试**。
     - 自动将 `service_name` 转换为健康的 `http://host:port`。
-    - `RetryConfig`: 支持配置重试次数及触发重试的状态码。当请求失败时，会自动拉取新实例进行重试。
+    - 支持 `protocol` 和 `path_prefix` 拼接完整请求 URL。
+    - 可通过 `health_threshold_ms=RedisKeys.SD_NO_HEALTH_CHECK` 关闭心跳健康探测。
+- `RetryConfig`: 支持配置重试次数及触发重试的状态码。当请求失败时，会自动拉取新实例进行重试。
 - **权重支持**: 注册时可传入 `weight`，由发现端按权重进行实例筛选（目前版本支持基于权重的随机，进阶版可深入扩展）。
 
 ## 维护建议
