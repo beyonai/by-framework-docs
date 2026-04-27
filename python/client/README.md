@@ -36,5 +36,18 @@ uv run python main.py
 uv run python main.py
 ```
 
-## 开发说明
-项目主要逻辑位于 `main.py` 中。您可以根据需要扩展更多指令发送或响应处理逻辑。
+## 核心功能说明
+
+项目核心逻辑封装在 `main.py` 的 `SyncGatewayClient` 类中，主要提供以下能力：
+
+1. **`send_message` (非阻塞发送)**
+   纯异步即发即弃调用，向目标 Worker 发送消息后立即返回 `response` 对象，不阻塞等待流式回复。适用于后台离线任务或纯指令触发。
+
+2. **`send_message_sync` (同步阻塞等待)**
+   发送消息并阻塞当前协程，自动监听并拼接 Redis 流中的实时事件（如 `answerDelta`、`reasoningLogDelta`）。
+   支持超时配置（`timeout_seconds`），若指定时间内未收到任何新 Token，将自动结束阻塞并返回当前已收集到的文本内容。
+
+3. **`subscribe_data_queue` (单独数据流监听)**
+   传入指定的 `session_id` 单独发起流式队列（Redis Stream）监听。内部兼容了 `bytes/str` 格式的数据解析，提供极具鲁棒性的容错和退出机制。
+
+（*注：日志输出已统一采用标准的 Python `logging` 模块管理，便于与您的生产环境整合。*）
