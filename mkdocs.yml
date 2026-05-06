@@ -1,0 +1,138 @@
+site_name: by-framework
+site_description: 分布式高性能 Agent 调度框架（Python / Java / TypeScript）
+site_author: byai team
+
+repo_url: https://github.com/beyonai/by-framework-samples
+repo_name: beyonai/by-framework-samples
+
+theme:
+  name: material
+  language: zh
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.trimming
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - toc.follow
+    - header.autohide
+
+plugins:
+  - search:
+      lang:
+        - en
+        - zh
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            docstring_style: google
+            merge_init_into_class: true
+            show_category_heading: true
+
+nav:
+  - 首页: index.md
+  - 指南:
+      - guide/index.md
+      - guide/getting-started.md
+      - guide/observability.md
+      - guide/worker-guide.md
+      - guide/plugin-guide.md
+      - guide/client-guide.md
+      - guide/discovery-guide.md
+      - guide/deployment.md
+  - 架构:
+      - architecture/index.md
+      - architecture/overview.md
+      - architecture/data-flow.md
+      - architecture/redis-streams.md
+      - architecture/plugin-system.md
+      - architecture/protocol.md
+  - 模块:
+      - modules/index.md
+      - modules/worker.md
+      - modules/context.md
+      - modules/client.md
+      - modules/registry.md
+      - modules/discovery.md
+  - API 参考:
+      - reference/index.md
+      - Python:
+          - reference/python/api-worker.md
+          - reference/python/api-context.md
+          - reference/python/api-client.md
+          - reference/python/api-protocol.md
+          - reference/python/api-plugin.md
+      - Java:
+          - reference/java/api-worker.md
+      - TypeScript:
+          - reference/typescript/api-worker.md
+  - 示例:
+      - samples/index.md
+      - samples/basic.md
+      - samples/streaming.md
+      - samples/plugin.md
+      - samples/multi-agent.md
+      - samples/langgraph.md
+  - 库文档:
+      - libs/index.md
+      - libs/langgraph.md
+      - libs/tracing.md
+      - libs/history.md
+  - 资源:
+      - resources/glossary.md
+      - resources/faq.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.mark
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/beyonai/by-framework-samples
+
+extra_javascript:
+  - https://unpkg.com/mermaid@11/dist/mermaid.min.js
