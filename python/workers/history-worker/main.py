@@ -45,8 +45,8 @@ class HistoryWorkerConfig:
             redis_host=os.environ.get("REDIS_HOST", "localhost"),
             redis_port=int(os.environ.get("REDIS_PORT", "6379")),
             redis_db=int(os.environ.get("REDIS_DB", "0")),
-            redis_username=os.environ.get("REDIS_USERNAME"),
-            redis_password=os.environ.get("REDIS_PASSWORD"),
+            redis_username=os.environ.get("REDIS_USERNAME", "myuser"),
+            redis_password=os.environ.get("REDIS_PASSWORD", "mypassword"),
             workspace_dir=os.environ.get("WORKSPACE_DIR", "/tmp/by-framework-samples"),
             consumer_group=os.environ.get("CONSUMER_GROUP", "agent_engines"),
             history_backend=os.environ.get("HISTORY_BACKEND", "in_memory"),
@@ -67,8 +67,8 @@ def build_history_backend(config: HistoryWorkerConfig) -> Any:
         return InMemoryHistoryBackend()
     if config.history_backend == "byclaw":
         if not config.byclaw_base_url:
-            raise ValueError("BYCLAW_HISTORY_BASE_URL is required for byclaw backend")
-        return ByClawHistoryBackend(base_url=config.byclaw_base_url)
+            return ByClawHistoryBackend()
+        return ByClawHistoryBackend()
     if config.history_backend == "postgres":
         if not config.postgres_dsn:
             raise ValueError("BYAI_HISTORY_PG_DSN is required for postgres backend")
@@ -153,7 +153,7 @@ def main() -> None:
         redis_password=config.redis_password,
         workspace_dir=config.workspace_dir,
         consumer_group=config.consumer_group,
-        history_backend=history_backend,
+        history_backend=ByClawHistoryBackend(),
         capability=config.capability,
         llm_config=config,
     )

@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>解构Byclaw Code Agent闭环工作流</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Poppins:wght@500;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ==========================================================================
+   1. THE SETUP & GLOBAL STYLES
+   ========================================================================== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f8fafc;
+            display: grid;
+            gap: 40px;
+            grid-template-columns: 1fr;
+            min-height: 100vh;
+            padding: 40px 0;
+            place-items: center;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+
+        /* Base Slide Container */
+        .slide-container {
+            align-items: center;
+            background-color: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(15, 23, 42, 0.05);
+            display: flex;
+            flex-direction: column;
+            height: 720px;
+            justify-content: flex-start;
+            overflow: hidden;
+            padding: 60px;
+            position: relative;
+            width: 1280px;
+        }
+
+        /* Casual Decorative Background Elements */
+        .slide-container::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .slide-container::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: -150px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .slide-container>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==========================================================================
+   2. TYPOGRAPHY
+   ========================================================================== */
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: #1e293b;
+            font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+            font-weight: 700;
+        }
+
+        p,
+        li,
+        .subtitle {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .slide-container h1 {
+            font-size: 72px;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .slide-container .slide-title {
+            font-size: 42px;
+            margin-bottom: 40px;
+            text-align: left;
+            width: 100%;
+            color: #0f172a;
+        }
+
+        .slide-container h3 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: #3b82f6;
+        }
+
+        .slide-container p,
+        .slide-container li {
+            font-size: 20px;
+        }
+
+        .slide-container .subtitle {
+            font-size: 24px;
+            font-weight: 400;
+            color: #64748b;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .slide-container .content-area {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        /* Accent Colors */
+        .text-violet {
+            color: #8b5cf6;
+        }
+
+        .text-emerald {
+            color: #10b981;
+        }
+
+        .text-amber {
+            color: #f59e0b;
+        }
+
+        .text-blue {
+            color: #3b82f6;
+        }
+
+        .text-rose {
+            color: #f43f5e;
+        }
+
+        /* ==========================================================================
+   3. LAYOUTS
+   ========================================================================== */
+        .title-layout {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            text-align: center;
+            width: 100%;
+        }
+
+        .two-column {
+            align-items: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .three-column {
+            align-items: stretch;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .two-column ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .two-column li {
+            margin-bottom: 24px;
+            padding-left: 36px;
+            position: relative;
+            background: #f8fafc;
+            padding: 20px 20px 20px 50px;
+            border-radius: 12px;
+        }
+
+        .two-column li i {
+            color: #3b82f6;
+            position: absolute;
+            left: 20px;
+            top: 24px;
+            font-size: 20px;
+        }
+
+        .two-column.tiled>div,
+        .three-column.tiled>div {
+            background-color: #f8fafc;
+            border-radius: 20px;
+            border: 2px dashed #e2e8f0;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .three-column.tiled>div {
+            border-style: solid;
+            border-color: #f1f5f9;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s ease;
+        }
+
+        .three-column.tiled>div:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.06);
+        }
+
+        .three-column.tiled .card-icon {
+            font-size: 48px;
+            margin-bottom: 25px;
+        }
+
+        /* Feature tags */
+        .feature-tag {
+            display: inline-block;
+            background: #e0e7ff;
+            color: #4f46e5;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        /* Code Mockup Styles */
+        .code-mockup {
+            background-color: #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            color: #e2e8f0;
+            font-size: 13px;
+            line-height: 1.6;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .code-mockup .keyword {
+            color: #c678dd;
+        }
+
+        .code-mockup .function {
+            color: #61afef;
+        }
+
+        .code-mockup .string {
+            color: #98c379;
+        }
+
+        .code-mockup .comment {
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .code-mockup .class {
+            color: #e5c07b;
+        }
+
+        /* Terminal Styles */
+        .terminal-window {
+            background-color: #0f172a;
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-family: 'Fira Code', monospace;
+            color: #e2e8f0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide-container" id="slide1">
+        <div class="title-layout">
+            <h1 style="line-height: 1.3; font-size: 46px; white-space: nowrap;">解构 <span
+                    class="text-blue">By-framework</span> 基座 与 <span class="text-violet">Byclaw Code Agent</span> 闭环
+            </h1>
+            <p class="subtitle" style="margin-top: 15px;">从分布式Agent调度引擎到大模型驱动的自动化研发工作流</p>
+        </div>
+
+        <!-- Presenter Info -->
+        <div
+            style="position: absolute; bottom: 60px; left: 0; width: 100%; text-align: center; display: flex; flex-direction: column; align-items: center;">
+            <div style="background: #cbd5e1; height: 3px; width: 40px; margin-bottom: 15px; border-radius: 2px;"></div>
+            <p style="font-size: 15px; color: #64748b; letter-spacing: 4px; margin-bottom: 8px;">汇报人</p>
+            <p style="font-size: 24px; color: #1e293b; font-weight: 700; font-family: 'Noto Sans SC', sans-serif;">
+                肖钟城 <span
+                    style="font-size: 16px; font-weight: 500; color: #64748b; margin-left: 15px; font-family: 'Poppins', sans-serif;">2026.5.11</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- NEW SLIDE: Table of Contents (Agenda) -->
+    <div class="slide-container" id="slide_toc">
+        <h2 class="slide-title" style="margin-bottom: 20px;">汇报目录 / Agenda</h2>
+        <div class="content-area" style="justify-content: center; padding-bottom: 10px;">
+            <div style="display: flex; flex-direction: column; gap: 15px; width: 85%; margin: 0 auto;">
+
+                <!-- Agenda Item 1 -->
+                <div
+                    style="display: flex; align-items: center; background: #ffffff; border-radius: 14px; padding: 15px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border-left: 6px solid #ef4444; transition: transform 0.2s ease;">
+                    <div
+                        style="font-size: 32px; font-weight: 800; color: #fca5a5; margin-right: 25px; font-family: 'Poppins', sans-serif;">
+                        01</div>
+                    <div>
+                        <h3 style="font-size: 20px; color: #1e293b; margin: 0 0 4px 0;">架构演进：旧架构的“三座大山”</h3>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">直面痛点：为什么我们需要彻底重构底层的调度基座</p>
+                    </div>
+                </div>
+
+                <!-- Agenda Item 2 -->
+                <div
+                    style="display: flex; align-items: center; background: #ffffff; border-radius: 14px; padding: 15px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border-left: 6px solid #3b82f6; transition: transform 0.2s ease;">
+                    <div
+                        style="font-size: 32px; font-weight: 800; color: #93c5fd; margin-right: 25px; font-family: 'Poppins', sans-serif;">
+                        02</div>
+                    <div>
+                        <h3 style="font-size: 20px; color: #1e293b; margin: 0 0 4px 0;">底层基座：By-framework 引擎解析</h3>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">解构 Gateway 引擎的边界解耦、智能路由与双流管控机制</p>
+                    </div>
+                </div>
+
+                <!-- Agenda Item 3 -->
+                <div
+                    style="display: flex; align-items: center; background: #ffffff; border-radius: 14px; padding: 15px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border-left: 6px solid #8b5cf6; transition: transform 0.2s ease;">
+                    <div
+                        style="font-size: 32px; font-weight: 800; color: #c4b5fd; margin-right: 25px; font-family: 'Poppins', sans-serif;">
+                        03</div>
+                    <div>
+                        <h3 style="font-size: 20px; color: #1e293b; margin: 0 0 4px 0;">核心能力：Code Agent 技能内核</h3>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">双重职能加持（PRD 解析与全栈构建）及 Worker SDK 强制规范</p>
+                    </div>
+                </div>
+
+                <!-- Agenda Item 4 -->
+                <div
+                    style="display: flex; align-items: center; background: #ffffff; border-radius: 14px; padding: 15px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border-left: 6px solid #10b981; transition: transform 0.2s ease;">
+                    <div
+                        style="font-size: 32px; font-weight: 800; color: #6ee7b7; margin-right: 25px; font-family: 'Poppins', sans-serif;">
+                        04</div>
+                    <div>
+                        <h3 style="font-size: 20px; color: #1e293b; margin: 0 0 4px 0;">实战演示：从无干预编码到极速验证</h3>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">自动生成三文件规范、Harness 工程沙箱与诊断自愈微循环</p>
+                    </div>
+                </div>
+
+                <!-- Agenda Item 5 -->
+                <div
+                    style="display: flex; align-items: center; background: #ffffff; border-radius: 14px; padding: 15px 25px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border-left: 6px solid #f59e0b; transition: transform 0.2s ease;">
+                    <div
+                        style="font-size: 32px; font-weight: 800; color: #fcd34d; margin-right: 25px; font-family: 'Poppins', sans-serif;">
+                        05</div>
+                    <div>
+                        <h3 style="font-size: 20px; color: #1e293b; margin: 0 0 4px 0;">闭环交付：平台注册与未来生态演进</h3>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">自动化构建打包推送、全局业务闭环与 Agent 多态架构蓝图</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW SLIDE: The Pain Points (Why By-framework?) - Visual Update -->
+    <div class="slide-container" id="slide_painpoints">
+        <h2 class="slide-title">架构演进：旧架构的“三座大山”</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 20px; font-size: 18px; color: #475569;">传统分布式 Agent 调度存在严重设计缺陷，亟需底层基座的彻底革新：</p>
+
+            <div class="two-column" style="gap: 40px; align-items: stretch; margin-bottom: 20px;">
+                <!-- Left: SVG Diagram of Broken Architecture -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; display: flex; flex-direction: column; justify-content: center;">
+                    <svg width="100%" height="320" viewBox="0 0 600 320">
+                        <defs>
+                            <marker id="arr-red-broken" markerWidth="6" markerHeight="6" refX="5" refY="3"
+                                orient="auto">
+                                <polygon points="0 0, 6 3, 0 6" fill="#ef4444" />
+                            </marker>
+                            <marker id="arr-orange" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <polygon points="0 0, 6 3, 0 6" fill="#f59e0b" />
+                            </marker>
+                            <marker id="arr-purple" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <polygon points="0 0, 6 3, 0 6" fill="#8b5cf6" />
+                            </marker>
+                            <filter id="shadow-sm">
+                                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0f172a"
+                                    flood-opacity="0.05" />
+                            </filter>
+                        </defs>
+
+                        <!-- Path 1: Sync Block -->
+                        <path d="M 140 160 L 225 160" fill="none" stroke="#ef4444" stroke-width="2"
+                            marker-end="url(#arr-red-broken)" />
+                        <rect x="150" y="130" width="64" height="22" fill="#fef2f2" stroke="#fecaca" stroke-width="1"
+                            rx="4" />
+                        <text x="182" y="141" fill="#ef4444" font-size="12" font-weight="bold" text-anchor="middle"
+                            dominant-baseline="central">同步阻塞</text>
+
+                        <!-- Path 2: Timeout -->
+                        <path d="M 340 150 L 445 85" fill="none" stroke="#f59e0b" stroke-width="2"
+                            stroke-dasharray="6,4" marker-end="url(#arr-orange)" />
+                        <rect x="360" y="85" width="64" height="22" fill="#fffbeb" stroke="#fde68a" stroke-width="1"
+                            rx="4" />
+                        <text x="392" y="96" fill="#d97706" font-size="12" font-weight="bold" text-anchor="middle"
+                            dominant-baseline="central">超时断开</text>
+                        <!-- Visual Break (X) -->
+                        <path d="M 395 118 L 405 108 M 395 108 L 405 118" fill="none" stroke="#ef4444"
+                            stroke-width="2" />
+
+                        <!-- Path 3: Hardcode -->
+                        <path d="M 340 170 L 445 235" fill="none" stroke="#8b5cf6" stroke-width="2"
+                            stroke-dasharray="6,4" marker-end="url(#arr-purple)" />
+                        <rect x="360" y="215" width="76" height="22" fill="#faf5ff" stroke="#e9d5ff" stroke-width="1"
+                            rx="4" />
+                        <text x="398" y="226" fill="#6d28d9" font-size="12" font-weight="bold" text-anchor="middle"
+                            dominant-baseline="central">硬编码寻址</text>
+
+                        <!-- Frontend Box -->
+                        <rect x="30" y="135" width="110" height="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"
+                            rx="8" filter="url(#shadow-sm)" />
+                        <text x="85" y="165" fill="#1e293b" font-size="14" font-weight="bold" text-anchor="middle"
+                            font-family="Noto Sans SC">前端业务</text>
+
+                        <!-- Gateway Box -->
+                        <rect x="230" y="135" width="110" height="50" fill="#fee2e2" stroke="#ef4444" stroke-width="2"
+                            rx="8" filter="url(#shadow-sm)" />
+                        <text x="285" y="165" fill="#991b1b" font-size="14" font-weight="bold" text-anchor="middle"
+                            font-family="Noto Sans SC">传统网关</text>
+                        <text x="285" y="205" fill="#ef4444" font-size="13" font-weight="bold" text-anchor="middle">⚠️
+                            线程池耗尽 / 崩溃</text>
+
+                        <!-- Agent 1 Box -->
+                        <rect x="450" y="60" width="120" height="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"
+                            rx="8" filter="url(#shadow-sm)" />
+                        <text x="510" y="80" fill="#1e293b" font-size="14" font-weight="bold" text-anchor="middle"
+                            font-family="Noto Sans SC">业务 Agent</text>
+                        <text x="510" y="100" fill="#64748b" font-size="11" text-anchor="middle">IP: 192.168.1.10</text>
+
+                        <!-- Agent 2 Box -->
+                        <rect x="450" y="210" width="120" height="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"
+                            rx="8" filter="url(#shadow-sm)" />
+                        <text x="510" y="230" fill="#1e293b" font-size="14" font-weight="bold" text-anchor="middle"
+                            font-family="Noto Sans SC">业务 Agent</text>
+                        <text x="510" y="250" fill="#64748b" font-size="11" text-anchor="middle">IP: 192.168.1.11</text>
+                    </svg>
+                </div>
+
+                <!-- Right: Concise Text Cards -->
+                <div style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <!-- Pain Point 1 -->
+                    <div
+                        style="border-left: 4px solid #ef4444; padding: 15px 20px; background: #fff1f2; border-radius: 0 8px 8px 0;">
+                        <h3 style="font-size: 18px; margin-bottom: 8px; color: #991b1b;"><i
+                                class="fa-solid fa-link-slash" style="margin-right: 10px;"></i>1. 全链路同步阻塞</h3>
+                        <p style="font-size: 14px; color: #7f1d1d; line-height: 1.5; margin: 0;">
+                            前端请求与后端推理强绑定，高并发下业务网关线程池迅速耗尽，引发系统雪崩。</p>
+                    </div>
+                    <!-- Pain Point 2 -->
+                    <div
+                        style="border-left: 4px solid #f59e0b; padding: 15px 20px; background: #fffbeb; border-radius: 0 8px 8px 0;">
+                        <h3 style="font-size: 18px; margin-bottom: 8px; color: #92400e;"><i
+                                class="fa-solid fa-hourglass-half" style="margin-right: 10px;"></i>2. 无法支撑超长任务</h3>
+                        <p style="font-size: 14px; color: #78350f; line-height: 1.5; margin: 0;">Agent 深度推理动辄耗时数分钟，传统同步
+                            HTTP 请求面临致命的网关超时截断问题。</p>
+                    </div>
+                    <!-- Pain Point 3 -->
+                    <div
+                        style="border-left: 4px solid #8b5cf6; padding: 15px 20px; background: #faf5ff; border-radius: 0 8px 8px 0;">
+                        <h3 style="font-size: 18px; margin-bottom: 8px; color: #6b21a8;"><i
+                                class="fa-solid fa-network-wired" style="margin-right: 10px;"></i>3. 网络耦合与寻址地狱</h3>
+                        <p style="font-size: 14px; color: #4c1d95; line-height: 1.5; margin: 0;">节点间网络强耦合，需硬编码目标 Worker
+                            IP。缺乏服务发现机制，无法弹性扩缩容。</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center;">
+                <i class="fa-solid fa-arrow-down"
+                    style="color: #3b82f6; font-size: 24px; animation: bounce 2s infinite;"></i>
+                <p style="margin-top: 5px; font-size: 16px; color: #1e293b; font-weight: bold;">为了彻底粉碎这些痛点，By-framework
+                    应运而生。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: NEW - By-framework Overview & Architecture -->
+    <div class="slide-container" id="slide2">
+        <h2 class="slide-title">底层基座：By-framework 引擎架构解析</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <div>
+                    <h3 class="text-violet"><i class="fa-solid fa-server"></i> 分布式高性能调度引擎</h3>
+                    <p style="margin-bottom: 20px;"><strong>By-framework</strong> 是构建整个 Agent 生态的基础设施，采用高度解耦的事件驱动架构设计。
+                    </p>
+
+                    <div style="margin-bottom: 25px;">
+                        <span class="feature-tag">Redis Streams 中枢</span>
+                        <span class="feature-tag">事件驱动解耦</span>
+                        <span class="feature-tag">跨层级隔离</span>
+                    </div>
+
+                    <ul style="margin-top: 20px;">
+                        <li><i class="fa-brands fa-python" style="color: #4f46e5;"></i><strong>多语言全覆盖 SDK：</strong>提供
+                            Python、Java、TypeScript 三种语言 SDK 支持，打破业务开发语言壁垒。</li>
+                        <li><i class="fa-solid fa-layer-group"
+                                style="color: #4f46e5;"></i><strong>清晰的架构分层：</strong>接入层（GatewayClient）拦截请求，执行层（Worker）处理计算，消费层渲染结果。
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- System Architecture SVG -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; height: 500px;">
+                    <svg width="100%" height="100%" viewBox="0 0 500 600">
+                        <defs>
+                            <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+                        <style>
+                            .bg-layer-green {
+                                fill: #f0fdf4;
+                                stroke: #bbf7d0;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-red {
+                                fill: #fef2f2;
+                                stroke: #fecaca;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-blue {
+                                fill: #eff6ff;
+                                stroke: #bfdbfe;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .node-box {
+                                fill: #ffffff;
+                                stroke: #cbd5e1;
+                                stroke-width: 1.5;
+                                rx: 6;
+                                filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+                            }
+
+                            .txt-layer {
+                                font-size: 14px;
+                                fill: #64748b;
+                                font-weight: bold;
+                            }
+
+                            .txt-node {
+                                font-size: 13px;
+                                fill: #1e293b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+                            }
+
+                            .txt-node-sub {
+                                font-size: 10px;
+                                fill: #64748b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', sans-serif;
+                            }
+
+                            .line-solid {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                marker-end: url(#arrow);
+                            }
+
+                            .line-dash {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                stroke-dasharray: 4, 4;
+                                marker-end: url(#arrow);
+                            }
+                        </style>
+                        <rect x="230" y="20" width="250" height="130" class="bg-layer-green" />
+                        <text x="245" y="45" class="txt-layer">接入层</text>
+                        <rect x="300" y="60" width="160" height="50" class="node-box" />
+                        <text x="380" y="80" class="txt-node">GatewayClient</text>
+                        <text x="380" y="100" class="txt-node-sub">ByaiGatewayClient</text>
+                        <rect x="180" y="180" width="300" height="250" class="bg-layer-red" />
+                        <text x="195" y="205" class="txt-layer">Redis 消息中枢</text>
+                        <rect x="200" y="230" width="130" height="50" class="node-box" />
+                        <text x="265" y="250" class="txt-node">Control Stream</text>
+                        <text x="265" y="270" class="txt-node-sub">ctrl:agent_type</text>
+                        <rect x="340" y="230" width="125" height="50" class="node-box" />
+                        <text x="402" y="250" class="txt-node">Worker Stream</text>
+                        <text x="402" y="270" class="txt-node-sub">ctrl:worker:id</text>
+                        <rect x="210" y="360" width="230" height="50" class="node-box" />
+                        <text x="325" y="380" class="txt-node">Data Stream</text>
+                        <text x="325" y="400" class="txt-node-sub">session:sid:data_stream</text>
+                        <rect x="20" y="230" width="150" height="230" class="bg-layer-blue" />
+                        <text x="35" y="255" class="txt-layer">执行层</text>
+                        <rect x="40" y="280" width="110" height="40" class="node-box" />
+                        <text x="95" y="305" class="txt-node">WorkerRunner</text>
+                        <rect x="40" y="340" width="110" height="40" class="node-box" />
+                        <text x="95" y="365" class="txt-node">GatewayWorker</text>
+                        <rect x="40" y="400" width="110" height="40" class="node-box" />
+                        <text x="95" y="425" class="txt-node">AgentContext</text>
+                        <rect x="210" y="460" width="230" height="110" class="bg-layer-blue" />
+                        <text x="225" y="485" class="txt-layer">消费层</text>
+                        <rect x="250" y="505" width="150" height="40" class="node-box" />
+                        <text x="325" y="530" class="txt-node">Backend / WebSocket</text>
+                        <path d="M 320 110 L 265 230" class="line-solid" />
+                        <path d="M 380 110 L 402 230" class="line-dash" />
+                        <path d="M 200 255 L 150 300" class="line-solid" />
+                        <path d="M 340 255 L 150 300" class="line-solid" />
+                        <path d="M 95 320 L 95 340" class="line-solid" />
+                        <path d="M 95 380 L 95 400" class="line-solid" />
+                        <path d="M 150 360 L 210 385" class="line-solid" />
+                        <path d="M 325 410 L 325 505" class="line-solid" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3a: Gateway Core - Decoupling -->
+    <div class="slide-container" id="slide3a">
+        <h2 class="slide-title">By-framework 核心 (1/3)：边界解耦与协议转换</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <!-- Focused SVG 1 -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; height: 500px;">
+                    <svg width="100%" height="100%" viewBox="0 0 500 600">
+                        <defs>
+                            <marker id="arrow1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+                        <style>
+                            .bg-layer-green {
+                                fill: #f0fdf4;
+                                stroke: #bbf7d0;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-red {
+                                fill: #fef2f2;
+                                stroke: #fecaca;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-blue {
+                                fill: #eff6ff;
+                                stroke: #bfdbfe;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .node-box {
+                                fill: #ffffff;
+                                stroke: #cbd5e1;
+                                stroke-width: 1.5;
+                                rx: 6;
+                                filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+                            }
+
+                            .txt-layer {
+                                font-size: 14px;
+                                fill: #64748b;
+                                font-weight: bold;
+                            }
+
+                            .txt-node {
+                                font-size: 13px;
+                                fill: #1e293b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+                            }
+
+                            .txt-node-sub {
+                                font-size: 10px;
+                                fill: #64748b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', sans-serif;
+                            }
+
+                            .line-solid {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                marker-end: url(#arrow1);
+                            }
+
+                            .line-dash {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                stroke-dasharray: 4, 4;
+                                marker-end: url(#arrow1);
+                            }
+                        </style>
+                        <rect x="230" y="20" width="250" height="130" class="bg-layer-green" />
+                        <text x="245" y="45" class="txt-layer" fill="#10b981">接入层</text>
+                        <rect x="300" y="60" width="160" height="50" class="node-box" stroke="#3b82f6"
+                            stroke-width="3" />
+                        <text x="380" y="80" class="txt-node">GatewayClient</text>
+                        <text x="380" y="100" class="txt-node-sub">ByaiGatewayClient</text>
+                        <path d="M 380 0 L 380 50" class="line-solid" stroke="#ef4444" stroke-width="2" />
+                        <text x="380" y="15" class="txt-node" fill="#ef4444" font-weight="bold">同步请求 (HTTP/WS)</text>
+                        <rect x="180" y="180" width="300" height="250" class="bg-layer-red" fill-opacity="0.5"
+                            stroke-opacity="0.5" />
+                        <text x="195" y="205" class="txt-layer">Redis 消息中枢</text>
+                        <rect x="200" y="230" width="130" height="50" class="node-box" stroke="#10b981"
+                            stroke-width="3" />
+                        <text x="265" y="250" class="txt-node">Control Stream</text>
+                        <text x="265" y="270" class="txt-node-sub">ctrl:agent_type</text>
+                        <path d="M 320 110 L 265 230" class="line-solid" stroke="#10b981" stroke-width="3" />
+                        <rect x="280" y="150" width="135" height="24" fill="#ffffff" rx="4"
+                            filter="drop-shadow(0 2px 4px rgba(0,0,0,0.1))" />
+                        <text x="347" y="166" class="txt-node" fill="#10b981" font-size="11" font-weight="bold">转化为
+                            AskAgentCommand</text>
+                        <g opacity="0.15">
+                            <rect x="340" y="230" width="125" height="50" class="node-box" />
+                            <rect x="210" y="360" width="230" height="50" class="node-box" />
+                            <rect x="20" y="230" width="150" height="230" class="bg-layer-blue" />
+                            <rect x="40" y="280" width="110" height="40" class="node-box" />
+                            <rect x="40" y="340" width="110" height="40" class="node-box" />
+                            <rect x="40" y="400" width="110" height="40" class="node-box" />
+                            <rect x="210" y="460" width="230" height="110" class="bg-layer-blue" />
+                            <rect x="250" y="505" width="150" height="40" class="node-box" />
+                            <path d="M 380 110 L 402 230" class="line-dash" />
+                            <path d="M 200 255 L 150 300" class="line-solid" />
+                            <path d="M 340 255 L 150 300" class="line-solid" />
+                            <path d="M 95 320 L 95 340" class="line-solid" />
+                            <path d="M 95 380 L 95 400" class="line-solid" />
+                            <path d="M 150 360 L 210 385" class="line-solid" />
+                            <path d="M 325 410 L 325 505" class="line-solid" />
+                        </g>
+                    </svg>
+                </div>
+                <!-- Text Content -->
+                <div>
+                    <div class="card-icon text-blue" style="font-size: 48px; margin-bottom: 20px;"><i
+                            class="fa-solid fa-arrows-split-up-and-left"></i></div>
+                    <h3 style="font-size: 32px; margin-bottom: 20px; color: #1e293b;">化解同步与异步的并发阻抗</h3>
+                    <p style="font-size: 18px; margin-bottom: 15px;">前端业务系统（如
+                        HTTP/WebSocket）的请求通常是<strong>同步且短时</strong>的，而 Agent 的大模型推理则是<strong>异步且长耗时</strong>的。</p>
+                    <p style="font-size: 18px; margin-bottom: 25px;"><code>GatewayClient</code> 在这里充当了完美的“隔离带”。</p>
+                    <ul>
+                        <li><i class="fa-solid fa-shield-halved"></i><strong>流量拦截：</strong>拦截前端同步请求，包装为标准的任务指令。</li>
+                        <li><i class="fa-solid fa-box-archive"></i><strong>协议转换：</strong>转化为异步
+                            <code>AskAgentCommand</code> 压入 Redis 消息队列。
+                        </li>
+                        <li><i class="fa-solid fa-bolt"></i><strong>极速释放：</strong>业务后端即刻释放线程，高并发下绝不会发生阻塞挂起。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3b: Gateway Core - Routing -->
+    <div class="slide-container" id="slide3b">
+        <h2 class="slide-title">By-framework 核心 (2/3)：调度与智能路由</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <!-- Focused SVG 2 -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; height: 500px;">
+                    <svg width="100%" height="100%" viewBox="0 0 500 600">
+                        <defs>
+                            <marker id="arrow2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+                        <style>
+                            .bg-layer-green {
+                                fill: #f0fdf4;
+                                stroke: #bbf7d0;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-red {
+                                fill: #fef2f2;
+                                stroke: #fecaca;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-blue {
+                                fill: #eff6ff;
+                                stroke: #bfdbfe;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .node-box {
+                                fill: #ffffff;
+                                stroke: #cbd5e1;
+                                stroke-width: 1.5;
+                                rx: 6;
+                                filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+                            }
+
+                            .txt-layer {
+                                font-size: 14px;
+                                fill: #64748b;
+                                font-weight: bold;
+                            }
+
+                            .txt-node {
+                                font-size: 13px;
+                                fill: #1e293b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+                            }
+
+                            .txt-node-sub {
+                                font-size: 10px;
+                                fill: #64748b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', sans-serif;
+                            }
+
+                            .line-solid {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                marker-end: url(#arrow2);
+                            }
+                        </style>
+                        <g opacity="0.15">
+                            <rect x="230" y="20" width="250" height="130" class="bg-layer-green" />
+                            <rect x="300" y="60" width="160" height="50" class="node-box" />
+                            <rect x="210" y="360" width="230" height="50" class="node-box" />
+                            <rect x="40" y="400" width="110" height="40" class="node-box" />
+                            <rect x="210" y="460" width="230" height="110" class="bg-layer-blue" />
+                            <rect x="250" y="505" width="150" height="40" class="node-box" />
+                            <path d="M 320 110 L 265 230" class="line-solid" />
+                            <path d="M 380 110 L 402 230" class="line-solid" stroke-dasharray="4,4" />
+                            <path d="M 95 380 L 95 400" class="line-solid" />
+                            <path d="M 150 360 L 210 385" class="line-solid" />
+                            <path d="M 325 410 L 325 505" class="line-solid" />
+                        </g>
+                        <rect x="180" y="180" width="300" height="250" class="bg-layer-red" fill-opacity="0.5"
+                            stroke-opacity="0.5" />
+                        <text x="195" y="205" class="txt-layer">Redis 消息中枢 (路由队列)</text>
+                        <rect x="200" y="230" width="130" height="50" class="node-box" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <text x="265" y="250" class="txt-node">Control Stream</text>
+                        <text x="265" y="270" class="txt-node-sub">ctrl:agent_type</text>
+                        <rect x="340" y="230" width="125" height="50" class="node-box" stroke="#3b82f6"
+                            stroke-width="2" />
+                        <text x="402" y="250" class="txt-node">Worker Stream</text>
+                        <text x="402" y="270" class="txt-node-sub">ctrl:worker:id</text>
+                        <rect x="20" y="230" width="150" height="230" class="bg-layer-blue" stroke="#3b82f6"
+                            stroke-width="2" fill-opacity="0.6" />
+                        <text x="35" y="255" class="txt-layer" fill="#2563eb">分布式 Worker</text>
+                        <rect x="40" y="280" width="110" height="40" class="node-box" stroke="#10b981"
+                            stroke-width="3" />
+                        <text x="95" y="305" class="txt-node">WorkerRunner</text>
+                        <rect x="40" y="340" width="110" height="40" class="node-box" />
+                        <text x="95" y="365" class="txt-node">GatewayWorker</text>
+                        <path d="M 200 255 L 150 300" class="line-solid" stroke="#3b82f6" stroke-width="2" />
+                        <path d="M 340 255 L 150 300" class="line-solid" stroke="#3b82f6" stroke-width="2" />
+                        <path d="M 95 320 L 95 340" class="line-solid" stroke="#10b981" stroke-width="2" />
+                        <rect x="170" y="280" width="120" height="22" fill="#ffffff" rx="4"
+                            filter="drop-shadow(0 2px 4px rgba(0,0,0,0.1))" />
+                        <text x="230" y="295" class="txt-node" fill="#3b82f6" font-size="11"
+                            font-weight="bold">target_agent_type</text>
+                    </svg>
+                </div>
+                <!-- Text Content -->
+                <div>
+                    <div class="card-icon text-emerald" style="font-size: 48px; margin-bottom: 20px;"><i
+                            class="fa-solid fa-route"></i></div>
+                    <h3 style="font-size: 32px; margin-bottom: 20px; color: #1e293b;">作为分布式流量集线器</h3>
+                    <p style="font-size: 18px; margin-bottom: 15px;">彻底告别传统的、需要硬编码 IP 端口的 RPC 调用。Gateway
+                        提供了一种更为优雅的服务发现机制。</p>
+                    <p style="font-size: 18px; margin-bottom: 25px;">网关层自动接管了复杂的任务寻址工作：</p>
+                    <ul>
+                        <li><i class="fa-solid fa-tag"></i><strong>类型声明：</strong>调用方只需在指令中声明
+                            <code>target_agent_type</code> 即可。
+                        </li>
+                        <li><i class="fa-solid fa-network-wired"></i><strong>智能分发：</strong>依托 Redis Consumer
+                            Group，系统自动拉取并分发任务。</li>
+                        <li><i class="fa-solid fa-scale-balanced"></i><strong>透明路由：</strong>任务精准路由给在线、空闲且匹配该类型的分布式
+                            <code>GatewayWorker</code>，天然实现负载均衡。
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3c: Gateway Core - Dual-Stream -->
+    <div class="slide-container" id="slide3c">
+        <h2 class="slide-title">By-framework 核心 (3/3)：双流全景管控</h2>
+        <div class="content-area">
+            <div class="two-column">
+                <!-- Focused SVG 3 -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 20px; height: 500px;">
+                    <svg width="100%" height="100%" viewBox="0 0 500 600">
+                        <defs>
+                            <marker id="arr-red" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#f43f5e" />
+                            </marker>
+                            <marker id="arr-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#0ea5e9" />
+                            </marker>
+                        </defs>
+                        <style>
+                            .bg-layer-green {
+                                fill: #f0fdf4;
+                                stroke: #bbf7d0;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-red {
+                                fill: #fef2f2;
+                                stroke: #fecaca;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .bg-layer-blue {
+                                fill: #eff6ff;
+                                stroke: #bfdbfe;
+                                stroke-width: 2;
+                                rx: 12;
+                            }
+
+                            .node-box {
+                                fill: #ffffff;
+                                stroke: #cbd5e1;
+                                stroke-width: 1.5;
+                                rx: 6;
+                                filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+                            }
+
+                            .txt-layer {
+                                font-size: 14px;
+                                fill: #64748b;
+                                font-weight: bold;
+                            }
+
+                            .txt-node {
+                                font-size: 13px;
+                                fill: #1e293b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', 'Noto Sans SC', sans-serif;
+                            }
+
+                            .txt-node-sub {
+                                font-size: 10px;
+                                fill: #64748b;
+                                text-anchor: middle;
+                                font-family: 'Poppins', sans-serif;
+                            }
+
+                            .line-solid {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                            }
+
+                            .line-dash {
+                                fill: none;
+                                stroke: #94a3b8;
+                                stroke-width: 1.5;
+                                stroke-dasharray: 4, 4;
+                            }
+                        </style>
+                        <g opacity="0.15">
+                            <rect x="230" y="20" width="250" height="130" class="bg-layer-green" />
+                            <rect x="300" y="60" width="160" height="50" class="node-box" />
+                            <rect x="340" y="230" width="125" height="50" class="node-box" />
+                            <path d="M 320 110 L 265 230" class="line-solid" />
+                            <path d="M 380 110 L 402 230" class="line-dash" />
+                            <path d="M 340 255 L 150 300" class="line-solid" />
+                        </g>
+                        <rect x="180" y="180" width="300" height="250" class="bg-layer-red" fill-opacity="0.3" />
+                        <text x="195" y="205" class="txt-layer">Redis 消息中枢</text>
+                        <rect x="200" y="230" width="130" height="50" class="node-box" stroke="#f43f5e"
+                            stroke-width="2" />
+                        <text x="265" y="250" class="txt-node">Control Stream</text>
+                        <rect x="210" y="360" width="230" height="50" class="node-box" stroke="#0ea5e9"
+                            stroke-width="2" />
+                        <text x="325" y="380" class="txt-node">Data Stream</text>
+                        <text x="325" y="400" class="txt-node-sub">session:sid:data_stream</text>
+                        <rect x="20" y="230" width="150" height="230" class="bg-layer-blue" />
+                        <text x="35" y="255" class="txt-layer">执行层</text>
+                        <rect x="40" y="280" width="110" height="40" class="node-box" stroke="#f43f5e" />
+                        <text x="95" y="305" class="txt-node">WorkerRunner</text>
+                        <rect x="40" y="340" width="110" height="40" class="node-box" />
+                        <text x="95" y="365" class="txt-node">GatewayWorker</text>
+                        <rect x="40" y="400" width="110" height="40" class="node-box" stroke="#0ea5e9" />
+                        <text x="95" y="425" class="txt-node">AgentContext</text>
+                        <rect x="210" y="460" width="230" height="110" class="bg-layer-blue" />
+                        <text x="225" y="485" class="txt-layer">消费层</text>
+                        <rect x="250" y="505" width="150" height="40" class="node-box" stroke="#0ea5e9"
+                            stroke-width="2" />
+                        <text x="325" y="530" class="txt-node">Backend / WebSocket</text>
+                        <path d="M 200 255 L 150 300" class="line-solid" stroke="#f43f5e" stroke-width="3"
+                            marker-end="url(#arr-red)" />
+                        <rect x="100" y="245" width="60" height="20" fill="#ffffff" rx="4" />
+                        <text x="130" y="259" class="txt-node" fill="#f43f5e" font-size="11"
+                            font-weight="bold">控制流</text>
+                        <path d="M 95 320 L 95 340" class="line-solid" stroke="#f43f5e" marker-end="url(#arr-red)" />
+                        <path d="M 95 380 L 95 400" class="line-solid" stroke="#0ea5e9" marker-end="url(#arr-blue)" />
+                        <path d="M 150 360 L 210 385" class="line-solid" stroke="#0ea5e9" stroke-width="3"
+                            marker-end="url(#arr-blue)" />
+                        <rect x="140" y="385" width="60" height="20" fill="#ffffff" rx="4" />
+                        <text x="170" y="399" class="txt-node" fill="#0ea5e9" font-size="11"
+                            font-weight="bold">数据流</text>
+                        <path d="M 325 410 L 325 505" class="line-solid" stroke="#0ea5e9" stroke-width="3"
+                            marker-end="url(#arr-blue)" />
+                    </svg>
+                </div>
+                <!-- Text Content -->
+                <div>
+                    <div class="card-icon text-rose" style="font-size: 48px; margin-bottom: 20px;"><i
+                            class="fa-solid fa-tower-broadcast"></i></div>
+                    <h3 style="font-size: 32px; margin-bottom: 20px; color: #1e293b;">接管 Agent 分布式生命周期</h3>
+                    <p style="font-size: 18px; margin-bottom: 15px;">网关引擎不只负责发包，它分离了控制数据与业务数据，实现了从头到尾的闭环管控：</p>
+                    <div
+                        style="background: #fff1f2; border-left: 4px solid #f43f5e; padding: 15px 20px; border-radius: 0 8px 8px 0; margin-bottom: 20px;">
+                        <h4 style="color: #e11d48; margin-bottom: 8px;"><i class="fa-solid fa-gears"
+                                style="margin-right: 8px;"></i>控制流 (Control Plane)</h4>
+                        <p style="font-size: 16px;">自上而下。负责下发任务指令、监控 Worker 心跳状态，并在异常触发时发送
+                            <code>CancelTaskCommand</code>，安全中断远端协程。
+                        </p>
+                    </div>
+                    <div
+                        style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #0284c7; margin-bottom: 8px;"><i class="fa-solid fa-water"
+                                style="margin-right: 8px;"></i>数据流 (Data Plane)</h4>
+                        <p style="font-size: 16px;">自下而上。Agent 产生的流式字符（如
+                            <code>emit_chunk</code>）和状态转移，统一封装为流式报文，跨节点推回消费端。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3d: Open Source Repos -->
+    <div class="slide-container" id="slide3d">
+        <h2 class="slide-title">By-framework 生态：多语言 SDK 与开源文档</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 40px; font-size: 18px; color: #475569;">为了打破业务开发的语言壁垒，By-framework
+                提供了完全开源、开箱即用的多语言客户端。您可以无缝将其接入到企业现有的技术栈中：</p>
+
+            <div class="three-column" style="gap: 30px; margin-bottom: 40px;">
+                <!-- Python -->
+                <div
+                    style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 35px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <i class="fa-brands fa-python" style="font-size: 56px; color: #3b82f6; margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 22px; color: #1e293b; margin-bottom: 12px;">Python SDK</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.6; flex-grow: 1;">
+                        大模型与数据科学领域的绝对主力，提供最原生的 Agent 编排与流式调用体验。</p>
+                    <a href="https://github.com/beyonai/by-framework-python" target="_blank"
+                        style="display: inline-flex; align-items: center; background: #f8fafc; color: #475569; padding: 10px 18px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 600; border: 1px solid #cbd5e1; width: 100%; justify-content: center;"><i
+                            class="fa-brands fa-github"
+                            style="margin-right: 8px; font-size: 16px;"></i>by-framework-python</a>
+                </div>
+
+                <!-- TypeScript -->
+                <div
+                    style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 35px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <i class="fa-brands fa-js" style="font-size: 56px; color: #f59e0b; margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 22px; color: #1e293b; margin-bottom: 12px;">TypeScript SDK</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.6; flex-grow: 1;">
+                        全栈及前端工程的首选，完美契合 Node.js 异步非阻塞的事件驱动高并发架构。</p>
+                    <a href="https://github.com/beyonai/by-framework-ts" target="_blank"
+                        style="display: inline-flex; align-items: center; background: #f8fafc; color: #475569; padding: 10px 18px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 600; border: 1px solid #cbd5e1; width: 100%; justify-content: center;"><i
+                            class="fa-brands fa-github"
+                            style="margin-right: 8px; font-size: 16px;"></i>by-framework-ts</a>
+                </div>
+
+                <!-- Java -->
+                <div
+                    style="background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; padding: 35px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <i class="fa-brands fa-java" style="font-size: 56px; color: #ef4444; margin-bottom: 20px;"></i>
+                    <h3 style="font-size: 22px; color: #1e293b; margin-bottom: 12px;">Java SDK</h3>
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 25px; line-height: 1.6; flex-grow: 1;">
+                        专为传统企业级核心系统打造，可以极其优雅地无缝对接 Spring Boot 微服务集群生态。</p>
+                    <a href="https://github.com/beyonai/by-framework-java" target="_blank"
+                        style="display: inline-flex; align-items: center; background: #f8fafc; color: #475569; padding: 10px 18px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 600; border: 1px solid #cbd5e1; width: 100%; justify-content: center;"><i
+                            class="fa-brands fa-github"
+                            style="margin-right: 8px; font-size: 16px;"></i>by-framework-java</a>
+                </div>
+            </div>
+
+            <!-- Docs -->
+            <div
+                style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border-radius: 16px; border: 1px solid #a7f3d0; padding: 30px 40px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 25px;">
+                    <div
+                        style="background: #ffffff; width: 70px; height: 70px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15); border: 1px solid #d1fae5;">
+                        <i class="fa-solid fa-book-open-reader" style="font-size: 32px; color: #10b981;"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 22px; color: #065f46; margin-bottom: 8px;">开发文档与核心示例 (Docs & Examples)
+                        </h3>
+                        <p style="font-size: 15px; color: #047857; margin: 0; line-height: 1.5;">
+                            包含各语言的快速上手指南、系统架构深度解析，以及开箱即用的 Agent Demo 代码库。</p>
+                    </div>
+                </div>
+                <a href="https://github.com/beyonai/by-framework-docs" target="_blank"
+                    style="display: inline-flex; align-items: center; background: #10b981; color: #ffffff; padding: 14px 28px; border-radius: 10px; font-size: 15px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);"><i
+                        class="fa-brands fa-github" style="margin-right: 10px; font-size: 18px;"></i>查阅官方文档</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Code Agent Underlying Logic -->
+    <div class="slide-container" id="slide4">
+        <h2 class="slide-title">底层逻辑：Byclaw Code Agent 的能力内核</h2>
+        <div class="content-area">
+            <!-- Top Banner: Core Foundation -->
+            <div
+                style="background: linear-gradient(135deg, #eff6ff 0%, #e0e7ff 100%); border-radius: 20px; padding: 35px; margin-bottom: 40px; border: 1px solid #bfdbfe; display: flex; align-items: center; justify-content: center; gap: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.03);">
+                <i class="fa-solid fa-microchip text-blue" style="font-size: 36px;"></i>
+                <h3 style="margin: 0; color: #1e293b; font-size: 26px;">核心引擎：Claude Code + Python SDK 能力增强</h3>
+            </div>
+
+            <div class="two-column tiled" style="gap: 40px;">
+                <!-- Skill 1: prd-creator -->
+                <div style="border-top: 6px solid #f59e0b; justify-content: flex-start; padding: 40px;">
+                    <div class="card-icon text-amber" style="font-size: 40px; margin-bottom: 20px;"><i
+                            class="fa-solid fa-pen-ruler"></i></div>
+                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #d97706;">Skill: prd-creator</h3>
+                    <p style="font-weight: 700; color: #1e293b; margin-bottom: 15px;"><i class="fa-solid fa-user-tie"
+                            style="color: #f59e0b; margin-right: 8px;"></i>AI 产品经理</p>
+                    <p style="font-size: 16px;">作为前置理解中枢，专用于深入理解用户的原始需求。它负责创建与构建 By-framework Agent
+                        相关的任务蓝图，将模糊的业务意图转化为清晰的构建说明。</p>
+                </div>
+
+                <!-- Skill 2: by-framework -->
+                <div style="border-top: 6px solid #8b5cf6; justify-content: flex-start; padding: 40px;">
+                    <div class="card-icon text-violet" style="font-size: 40px; margin-bottom: 20px;"><i
+                            class="fa-solid fa-code-compare"></i></div>
+                    <h3 style="font-size: 24px; margin-bottom: 15px; color: #6d28d9;">Skill: by-framework</h3>
+                    <p style="font-weight: 700; color: #1e293b; margin-bottom: 15px;"><i class="fa-solid fa-user-gear"
+                            style="color: #8b5cf6; margin-right: 8px;"></i>AI 全栈工程师</p>
+                    <p style="font-size: 16px;">作为硬核执行者，提供构建 By-framework Agent 的端到端完整技能包。它全面接管
+                        <strong>开发、测试、编译、发布</strong> 的所有技术环节，负责将产品蓝图落地为代码实体。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 5: Worker SDK Architecture based on skill.md (Optimized Layout) -->
+    <div class="slide-container" id="slide5">
+        <h2 class="slide-title">实战基石：By-framework Worker SDK 核心规范</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 30px; font-size: 18px;">为了确保分布式系统的高可用，Code Agent 在构建数字员工时，必须严格遵循 SDK 定义的工程范式与事件机制。
+            </p>
+
+            <div class="two-column" style="align-items: stretch; gap: 40px;">
+
+                <!-- Left: Mandatory File Structure -->
+                <div
+                    style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                    <h3 class="text-blue" style="margin-bottom: 25px;"><i class="fa-solid fa-folder-tree"
+                            style="margin-right: 10px;"></i>强制工程目录结构</h3>
+                    <p style="font-size: 14px; margin-bottom: 20px; color: #475569;">构建 Gateway Worker 时，必须遵循以下结构，<span
+                            style="color: #ef4444; font-weight: bold;">不可变更</span>：</p>
+
+                    <div class="code-mockup" style="background: #0f172a; padding: 25px; font-size: 14px; flex-grow: 1;">
+                        <div style="color: #38bdf8; font-weight: bold; margin-bottom: 10px;">my-worker/</div>
+                        <div style="margin-left: 20px; color: #e2e8f0; margin-bottom: 5px;">├── <span
+                                style="color: #c678dd;">src/</span></div>
+
+                        <div style="margin-left: 40px; color: #98c379; margin-bottom: 5px;">
+                            ├── worker.ts
+                            <span class="comment" style="margin-left: 15px;"># 继承 GatewayWorker (核心逻辑)</span>
+                        </div>
+                        <div style="margin-left: 40px; color: #98c379; margin-bottom: 5px;">
+                            ├── run.ts
+                            <span class="comment" style="margin-left: 36px;"># 独立进程启动 (WorkerRunner)</span>
+                        </div>
+                        <div style="margin-left: 40px; color: #98c379; margin-bottom: 15px;">
+                            └── index.ts
+                            <span class="comment" style="margin-left: 22px; color: #fbbf24;"># 必须 export default
+                                runWorker</span>
+                        </div>
+
+                        <div style="margin-left: 20px; color: #e2e8f0; margin-bottom: 5px;">├── <span
+                                style="color: #c678dd;">dist/</span> <span class="comment" style="margin-left: 41px;">#
+                                tsup 编译输出产物</span></div>
+                        <div style="margin-left: 20px; color: #e2e8f0; margin-bottom: 5px;">├── package.json</div>
+                        <div style="margin-left: 20px; color: #e2e8f0;">└── tsup.config.ts</div>
+                    </div>
+                </div>
+
+                <!-- Right: Core SDK Principles -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                    <!-- Principle 1 -->
+                    <div
+                        style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 25px; flex: 1;">
+                        <h4 style="font-size: 18px; color: #166534; margin-bottom: 10px;">
+                            <i class="fa-solid fa-arrows-rotate" style="margin-right: 8px;"></i>主动拉取模型 (Pull Model)
+                        </h4>
+                        <p style="font-size: 14px; color: #475569; line-height: 1.6;">Worker 主动通过 Redis Stream
+                            拉取任务，而非被动接收 HTTP 请求。这种设计天然支持无状态集群扩展，完美应对大流量洪峰。</p>
+                    </div>
+
+                    <!-- Principle 2 -->
+                    <div
+                        style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 16px; padding: 25px; flex: 1;">
+                        <h4 style="font-size: 18px; color: #1e40af; margin-bottom: 10px;">
+                            <i class="fa-solid fa-toolbox" style="margin-right: 8px;"></i>全能型 AgentContext
+                        </h4>
+                        <p style="font-size: 14px; color: #475569; line-height: 1.6;">执行上下文不仅提供 <code>emitChunk</code>
+                            进行 SSE 流式响应，还内置了 <code>checkCancelled()</code>，可在长耗时任务中实现一键级联中断，防止算力泄漏。</p>
+                    </div>
+
+                    <!-- Principle 3 -->
+                    <div
+                        style="background: #fdf4ff; border: 1px solid #fbcfe8; border-radius: 16px; padding: 25px; flex: 1;">
+                        <h4 style="font-size: 18px; color: #86198f; margin-bottom: 10px;">
+                            <i class="fa-solid fa-diagram-project" style="margin-right: 8px;"></i>标准化状态机流转
+                        </h4>
+                        <p style="font-size: 14px; color: #475569; line-height: 1.6;">接管生命周期，严格遵循：<br>
+                            <code
+                                style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px;">QUEUED</code>
+                            &rarr;
+                            <code
+                                style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px;">STARTING</code>
+                            &rarr;
+                            <code
+                                style="background: #fce7f3; color: #be185d; padding: 2px 6px; border-radius: 4px;">COMPLETED / FAILED / CANCELLED</code>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+     NEW SECTION: CODING, TESTING, DEPLOYING 
+     ========================================== -->
+
+    <!-- Slide 6: Action - Writing Code -->
+    <div class="slide-container" id="slide6">
+        <h2 class="slide-title">实战环节 ①：Code Agent 如何写代码？</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 25px;">依靠 <code>by-framework</code> 技能，Code Agent 会自动为您生成符合 Gateway
+                规范的<strong>强制三文件结构</strong>，无需人工介入模板编写。</p>
+
+            <div class="three-column" style="gap: 25px;">
+                <!-- File 1: worker.ts -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div
+                        style="background: #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #334155;">
+                        <i class="fa-brands fa-js" style="color: #eab308; margin-right: 8px;"></i> src/worker.ts
+                    </div>
+                    <div class="code-mockup" style="flex-grow: 1; border-radius: 0 0 8px 8px;">
+                        <span class="comment">// 核心业务逻辑实现</span><br><br>
+                        <span class="keyword">export class</span> <span class="class">MyWorker</span> <span
+                            class="keyword">extends</span> <span class="class">GatewayWorker</span> {<br>
+                        &nbsp;&nbsp;<span class="function">getAgentTypes</span>() {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> [<span
+                            class="string">'my-agent'</span>];<br>
+                        &nbsp;&nbsp;}<br><br>
+                        &nbsp;&nbsp;<span class="keyword">async</span> <span class="function">processCommand</span>(cmd,
+                        ctx) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">for</span> (<span class="keyword">const</span>
+                        char <span class="keyword">of</span> text) {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">await</span> ctx.<span
+                            class="function">emitChunk</span>({ <span class="string">content</span>: char });<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> { <span
+                            class="string">status</span>: <span class="string">'done'</span> };<br>
+                        &nbsp;&nbsp;}<br>
+                        }
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; text-align: center; margin-top: 5px;">负责声明 Agent
+                        类型与流式业务处理</p>
+                </div>
+
+                <!-- File 2: run.ts -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div
+                        style="background: #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #334155;">
+                        <i class="fa-brands fa-node-js" style="color: #22c55e; margin-right: 8px;"></i> src/run.ts
+                    </div>
+                    <div class="code-mockup" style="flex-grow: 1; border-radius: 0 0 8px 8px;">
+                        <span class="comment">// 独立进程启动入口</span><br><br>
+                        <span class="keyword">import</span> { <span class="class">WorkerRunner</span> } <span
+                            class="keyword">from</span> <span class="string">'@byclaw...'</span>;<br>
+                        <span class="keyword">import</span> { <span class="class">MyWorker</span> } <span
+                            class="keyword">from</span> <span class="string">'./worker.js'</span>;<br><br>
+                        <span class="keyword">async function</span> <span class="function">main</span>() {<br>
+                        &nbsp;&nbsp;<span class="keyword">const</span> redis = <span
+                            class="function">createRedis</span>({...});<br>
+                        &nbsp;&nbsp;<span class="keyword">const</span> worker = <span class="keyword">new</span> <span
+                            class="class">MyWorker</span>(<span class="string">`worker-my-`</span>);<br>
+                        &nbsp;&nbsp;<span class="keyword">const</span> runner = <span class="keyword">new</span> <span
+                            class="class">WorkerRunner</span>(worker);<br><br>
+                        &nbsp;&nbsp;<span class="keyword">await</span> runner.<span class="function">start</span>({
+                        <span class="string">handleSignals</span>: <span class="keyword">true</span> });<br>
+                        }<br>
+                        <span class="function">main</span>();
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; text-align: center; margin-top: 5px;">绑定 Redis，启动 Runner
+                        轮询消息</p>
+                </div>
+
+                <!-- File 3: index.ts -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div
+                        style="background: #e2e8f0; padding: 10px 15px; border-radius: 8px 8px 0 0; border-bottom: 2px solid #cbd5e1; font-weight: bold; color: #334155;">
+                        <i class="fa-solid fa-cube" style="color: #3b82f6; margin-right: 8px;"></i> src/index.ts
+                    </div>
+                    <div class="code-mockup" style="flex-grow: 1; border-radius: 0 0 8px 8px;">
+                        <span class="comment">// 强制的库导出规范</span><br><br>
+                        <span class="keyword">import</span> { <span class="class">MyWorker</span> } <span
+                            class="keyword">from</span> <span class="string">'./worker.js'</span>;<br><br>
+                        <span class="keyword">async function</span> <span class="function">runWorker</span>(input, sid,
+                        tid) {<br>
+                        &nbsp;&nbsp;<span class="comment">// ... 初始化 header 与 command</span><br>
+                        &nbsp;&nbsp;<span class="keyword">try</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">const</span> worker = <span
+                            class="keyword">new</span> <span class="class">MyWorker</span>(...);<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">await</span> worker.<span
+                            class="function">handleMessage</span>(command);<br>
+                        &nbsp;&nbsp;} <span class="keyword">finally</span> {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">await</span> <span
+                            class="function">closeRedis</span>();<br>
+                        &nbsp;&nbsp;}<br>
+                        }<br><br>
+                        <span class="keyword">export default</span> <span class="function">runWorker</span>;
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; text-align: center; margin-top: 5px;">供系统其他组件动态嵌入调用</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 7: Action - Testing -->
+    <div class="slide-container" id="slide7">
+        <h2 class="slide-title">实战环节 ②：Code Agent 如何自动测试？</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 20px;">Code Agent 熟知框架测试规范。写完代码后，它会利用底层的控制流和数据流机制，启动**无人工干预**的本地自测与逻辑纠错闭环。</p>
+
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: stretch;">
+                <!-- Left: Test Steps -->
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div
+                        style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #1e293b; margin-bottom: 5px;">1. 启动守护进程</h4>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;"><code>npm run dev</code> (或 tsx
+                            src/run.ts)<br>启动 WorkerRunner 监听 Redis。</p>
+                    </div>
+                    <div
+                        style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #1e293b; margin-bottom: 5px;">2. 开启数据流订阅</h4>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">
+                            <code>npx tsx reference/verify-subscribe.ts</code><br>在另一终端监听流式响应，防遗漏。
+                        </p>
+                    </div>
+                    <div
+                        style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #1e293b; margin-bottom: 5px;">3. 模拟网关发包</h4>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">
+                            <code>npx tsx reference/send-test.ts</code><br>注入测试数据，触发业务逻辑。
+                        </p>
+                    </div>
+                    <div
+                        style="background: #f3e8ff; border-left: 4px solid #a855f7; padding: 15px 20px; border-radius: 0 8px 8px 0;">
+                        <h4 style="color: #1e293b; margin-bottom: 5px;">4. 强制结构断言</h4>
+                        <p style="font-size: 14px; color: #64748b; margin: 0;">
+                            <code>npx tsx src/verify-index.ts</code><br>强校验 `runWorker` 导出签名合法性。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right: Terminal Mockup -->
+                <div class="terminal-window" style="display: flex; flex-direction: column;">
+                    <div class="terminal-header">
+                        <div class="terminal-dot" style="background: #ef4444;"></div>
+                        <div class="terminal-dot" style="background: #eab308;"></div>
+                        <div class="terminal-dot" style="background: #22c55e;"></div>
+                        <span style="margin-left: 10px; color: #64748b; font-size: 12px;">Byclaw Test Runner — Code
+                            Agent Self-Correction</span>
+                    </div>
+                    <div style="flex-grow: 1; overflow-y: auto; font-size: 14px; line-height: 1.8;">
+                        <span style="color: #3b82f6;">$ npx tsx reference/verify-subscribe.ts
+                            test-session-001</span><br>
+                        <span style="color: #94a3b8;">监听数据流:
+                            byai_gateway:session:test-session-001:data_stream</span><br><br>
+
+                        <span style="color: #22c55e;">[1712345678901] type=state_change state=STARTING</span><br>
+                        <span style="color: #e2e8f0;">[1712345678902] type=chunk content="处理中: 正在调用大模型..."</span><br>
+                        <span style="color: #e2e8f0;">[1712345678930] type=chunk content="分析完毕，结果已返回。"</span><br>
+                        <span style="color: #22c55e;">[1712345678950] type=state_change state=COMPLETED</span><br><br>
+
+                        <span style="color: #a855f7;">$ cp reference/verify-index.ts src/ && npx tsx
+                            src/verify-index.ts</span><br>
+                        <span style="color: #22c55e;">✔ 发现默认导出 runWorker</span><br>
+                        <span style="color: #22c55e;">✔ 签名验证通过</span><br>
+                        <span style="color: #38bdf8;">=> 测试执行完毕, Agent 状态健康。</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Action - Building & Registering -->
+    <div class="slide-container" id="slide8">
+        <h2 class="slide-title">实战环节 ③：编译、上传与注册</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 40px;">代码测通后，Code Agent 将执行标准化的发布流线：将 TS 源码编译打包，利用工具注册资源 ID，并自动推送至 MinIO 远端对象存储。
+            </p>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+
+                <!-- Step 1: Build -->
+                <div style="text-align: center; width: 25%;">
+                    <div
+                        style="width: 80px; height: 80px; background: #eff6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #3b82f6; font-size: 32px;">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <h4 style="font-size: 18px; color: #1e293b; margin-bottom: 8px;">1. 本地构建 (tsup)</h4>
+                    <p style="font-size: 13px; color: #64748b;">依据 <code>tsup.config.ts</code> 规范，将源码打包为
+                        <code>dist/</code> 产物。
+                    </p>
+                    <div
+                        style="margin-top: 10px; background: #1e293b; color: #38bdf8; padding: 4px 10px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 11px; display: inline-block;">
+                        $ npx tsup
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-arrow-right-long" style="font-size: 24px; color: #cbd5e1;"></i>
+
+                <!-- Step 2: Register -->
+                <div style="text-align: center; width: 25%;">
+                    <div
+                        style="width: 80px; height: 80px; background: #fef2f2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #ef4444; font-size: 32px;">
+                        <i class="fa-solid fa-id-card-clip"></i>
+                    </div>
+                    <h4 style="font-size: 18px; color: #1e293b; margin-bottom: 8px;">2. 平台注册</h4>
+                    <p style="font-size: 13px; color: #64748b;">调用 <code>register_agent</code> 工具，获取唯一的
+                        <code>resourceId</code>。
+                    </p>
+                    <div
+                        style="margin-top: 10px; background: #1e293b; color: #f87171; padding: 4px 10px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 11px; display: inline-block;">
+                        API: register_agent()
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-arrow-right-long" style="font-size: 24px; color: #cbd5e1;"></i>
+
+                <!-- Step 3: Upload -->
+                <div style="text-align: center; width: 25%;">
+                    <div
+                        style="width: 80px; height: 80px; background: #f0fdf4; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; color: #10b981; font-size: 32px;">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <h4 style="font-size: 18px; color: #1e293b; margin-bottom: 8px;">3. 推送 MinIO</h4>
+                    <p style="font-size: 13px; color: #64748b;">使用 <code>mc cp</code> 将 <code>dist/*</code> 推送至以
+                        resourceId 命名的远端路径。</p>
+                    <div
+                        style="margin-top: 10px; background: #1e293b; color: #34d399; padding: 4px 10px; border-radius: 6px; font-family: 'Fira Code', monospace; font-size: 11px; display: inline-block;">
+                        $ mc cp -r dist/* myminio/...
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; text-align: center; color: #64748b; font-size: 15px;">
+                <i class="fa-solid fa-circle-check text-emerald" style="margin-right: 8px;"></i>最后通过
+                <code>query_agent_detail</code> 工具进行结果确权，数字员工正式诞生！
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: Harness Engineering Integration & The Future -->
+    <div class="slide-container" id="slide9">
+        <h2 class="slide-title" style="margin-bottom: 12px;">实战进阶：结合 Harness 迈向真正的 Agentic Engineering</h2>
+        <div class="content-area">
+
+            <!-- Translation Quote Box -->
+            <div
+                style="background: #eff6ff; border-left: 5px solid #3b82f6; padding: 12px 20px; border-radius: 0 10px 10px 0; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);">
+                <h3 style="font-size: 16px; color: #1e293b; margin: 0; line-height: 1.5;">
+                    智能体开发的未来，绝不仅仅是拥有一个<span
+                        style="color: #ef4444; border-bottom: 2px solid #fecaca; padding-bottom: 2px;">更会写代码的
+                        Agent</span>。<br>
+                    它更是<span style="color: #3b82f6;">更好的上下文</span>、<span style="color: #8b5cf6;">更好的分发</span>、<span
+                        style="color: #10b981;">更好的评估</span>、<span style="color: #f59e0b;">更好的观测</span>，以及<span
+                        style="color: #f43f5e;">更好的反馈闭环</span>。
+                </h3>
+            </div>
+
+            <!-- 5 Pillars Architecture Map -->
+            <div
+                style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 10px; display: flex; justify-content: center; align-items: center; flex-grow: 1; min-height: 0; width: 88%; margin: 0 auto;">
+                <svg width="100%" height="100%" viewBox="0 0 1000 415" style="max-height: 100%;">
+                    <defs>
+                        <marker id="arr-gray" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#94a3b8" />
+                        </marker>
+                        <marker id="arr-red-fb" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#ef4444" />
+                        </marker>
+                        <filter id="shadow-md">
+                            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.08" />
+                        </filter>
+                        <filter id="shadow-sm">
+                            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.05" />
+                        </filter>
+                    </defs>
+
+                    <!-- Left Node: Code Agent -->
+                    <rect x="40" y="160" width="200" height="90" fill="#fff1f2" stroke="#fecaca" stroke-width="2"
+                        rx="16" filter="url(#shadow-md)" />
+                    <text x="140" y="200" fill="#ef4444" font-size="20" font-weight="bold" text-anchor="middle"
+                        font-family="Poppins">Code Agent</text>
+                    <text x="140" y="225" fill="#f87171" font-size="13" text-anchor="middle"
+                        font-family="Noto Sans SC">更聪明的“代码大脑”</text>
+
+                    <!-- Right Super Node: Harness Sandbox -->
+                    <rect x="380" y="60" width="580" height="250" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"
+                        stroke-dasharray="8,4" rx="20" />
+                    <text x="670" y="95" fill="#475569" font-size="18" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">Harness 工程沙箱基础设施</text>
+
+                    <!-- Inner 1: Context (Blue) -->
+                    <rect x="410" y="120" width="250" height="70" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2"
+                        rx="10" filter="url(#shadow-sm)" />
+                    <text x="535" y="148" fill="#2563eb" font-size="15" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">1. 更好的上下文 (Context)</text>
+                    <text x="535" y="170" fill="#3b82f6" font-size="12" text-anchor="middle"
+                        font-family="Noto Sans SC">内存级 Mock 中枢，提供纯净运行态</text>
+
+                    <!-- Inner 2: Distribution (Purple) -->
+                    <rect x="680" y="120" width="250" height="70" fill="#faf5ff" stroke="#e9d5ff" stroke-width="2"
+                        rx="10" filter="url(#shadow-sm)" />
+                    <text x="805" y="148" fill="#7e22ce" font-size="15" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">2. 更好的分发 (Distribution)</text>
+                    <text x="805" y="170" fill="#8b5cf6" font-size="12" text-anchor="middle"
+                        font-family="Noto Sans SC">绕过真实网络，沙箱内极速事件调度</text>
+
+                    <!-- Inner 3: Evaluation (Green) -->
+                    <rect x="410" y="210" width="520" height="70" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="2"
+                        rx="10" filter="url(#shadow-sm)" />
+                    <text x="670" y="238" fill="#059669" font-size="15" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">3. 更好的评估体系 (Evaluation)</text>
+                    <text x="670" y="260" fill="#10b981" font-size="12" text-anchor="middle"
+                        font-family="Noto Sans SC">调用断言 SDK (expectState) 建立确定性的质量护栏</text>
+
+                    <!-- Top Arc: Code -> Harness -->
+                    <path d="M 140 160 C 140 10, 670 10, 670 60" fill="none" stroke="#94a3b8" stroke-width="2"
+                        stroke-dasharray="6,4" marker-end="url(#arr-gray)" />
+                    <rect x="330" y="22" width="150" height="26" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"
+                        rx="13" />
+                    <text x="405" y="40" fill="#64748b" font-size="12" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">注入代码与测试任务</text>
+
+                    <!-- Bottom Arc: Harness -> Code (The Feedback Loop) -->
+                    <path d="M 670 310 C 670 430, 140 430, 140 250" fill="none" stroke="#ef4444" stroke-width="3"
+                        marker-end="url(#arr-red-fb)" />
+
+                    <!-- Bottom Arc Badges -->
+                    <!-- 4. Observation (Orange) -->
+                    <rect x="520" y="355" width="280" height="50" fill="#fffbeb" stroke="#fde68a" stroke-width="2"
+                        rx="25" filter="url(#shadow-sm)" />
+                    <text x="660" y="378" fill="#d97706" font-size="14" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">4. 更好的观测 (Observation)</text>
+                    <text x="660" y="396" fill="#f59e0b" font-size="11" text-anchor="middle"
+                        font-family="Noto Sans SC">实时精准捕获深层流状态与异常栈帧</text>
+
+                    <!-- 5. Feedback (Rose) -->
+                    <rect x="110" y="355" width="280" height="50" fill="#fff1f2" stroke="#fecaca" stroke-width="2"
+                        rx="25" filter="url(#shadow-sm)" />
+                    <text x="250" y="378" fill="#e11d48" font-size="14" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">5. 更好的反馈闭环 (Feedback)</text>
+                    <text x="250" y="396" fill="#f43f5e" font-size="11" text-anchor="middle"
+                        font-family="Noto Sans SC">打包为结构化 JSON，触发大模型毫秒级自愈</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Next Steps (Visualized Architecture) -->
+    <div class="slide-container" id="slide10">
+        <h2 class="slide-title">未来演进：全局闭环与生态延展</h2>
+        <div class="content-area">
+            <p style="margin-bottom: 30px; font-size: 18px; color: #475569;">打通了局部的“构建流”之后，我们的愿景是走向更宏大的“自进化平台”与“多态生态”：
+            </p>
+
+            <div
+                style="background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px; display: flex; justify-content: center; align-items: center; flex-grow: 1;">
+                <svg width="100%" height="400" viewBox="0 0 1000 400">
+                    <defs>
+                        <marker id="arr-red-f" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#ef4444" />
+                        </marker>
+                        <marker id="arr-green-f" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#10b981" />
+                        </marker>
+                        <marker id="arr-purple-f" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                            <polygon points="0 0, 6 3, 0 6" fill="#8b5cf6" />
+                        </marker>
+                        <filter id="shadow-lg">
+                            <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.1" />
+                        </filter>
+                    </defs>
+
+                    <!-- Central Hub -->
+                    <rect x="350" y="160" width="200" height="80" fill="#e0e7ff" stroke="#6366f1" stroke-width="2"
+                        rx="12" filter="url(#shadow-lg)" />
+                    <text x="450" y="195" fill="#3730a3" font-size="18" font-weight="bold" text-anchor="middle"
+                        font-family="Poppins">Byclaw Code Agent</text>
+                    <text x="450" y="215" fill="#4338ca" font-size="13" text-anchor="middle"
+                        font-family="Noto Sans SC">自动化构建引擎</text>
+
+                    <!-- Left Hub: Byclaw Platform -->
+                    <rect x="50" y="160" width="160" height="80" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"
+                        rx="12" filter="url(#shadow-md)" />
+                    <text x="130" y="195" fill="#1e40af" font-size="18" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">Byclaw 平台</text>
+                    <text x="130" y="215" fill="#1e3a8a" font-size="12" text-anchor="middle"
+                        font-family="Noto Sans SC">业务主站 / 监控体系</text>
+
+                    <!-- Loop between Left and Center -->
+                    <!-- Top Arc: Platform to Agent (Feedback) -->
+                    <path d="M 130 160 C 130 40, 450 40, 450 154" fill="none" stroke="#ef4444" stroke-width="2"
+                        stroke-dasharray="6,4" marker-end="url(#arr-red-f)" />
+                    <rect x="220" y="65" width="140" height="26" fill="#ffffff" stroke="#fecaca" stroke-width="1.5"
+                        rx="13" />
+                    <text x="290" y="83" fill="#ef4444" font-size="13" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">真实业务报错反馈</text>
+
+                    <!-- Bottom Arc: Agent to Platform (Publish) -->
+                    <path d="M 450 240 C 450 360, 130 360, 130 246" fill="none" stroke="#10b981" stroke-width="3"
+                        marker-end="url(#arr-green-f)" />
+                    <rect x="200" y="307" width="180" height="26" fill="#ffffff" stroke="#bbf7d0" stroke-width="1.5"
+                        rx="13" />
+                    <text x="290" y="325" fill="#059669" font-size="13" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">持续治理与热迭代发布</text>
+
+                    <text x="290" y="380" fill="#1e293b" font-size="16" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">1. 全局自愈演进闭环</text>
+
+                    <!-- Right Hubs: Poly agents -->
+                    <!-- Curve 1: By-framework Agent -->
+                    <path d="M 550 200 C 640 200, 640 130, 734 130" fill="none" stroke="#8b5cf6" stroke-width="2"
+                        marker-end="url(#arr-purple-f)" />
+                    <rect x="740" y="100" width="220" height="60" fill="#faf5ff" stroke="#a855f7" stroke-width="2"
+                        rx="8" filter="url(#shadow-md)" />
+                    <text x="850" y="135" fill="#6b21a8" font-size="16" font-weight="bold" text-anchor="middle"
+                        font-family="Poppins">By-framework Agent</text>
+
+                    <!-- Curve 2: 更多第三方/定制 SDK -->
+                    <path d="M 550 200 C 640 200, 640 270, 734 270" fill="none" stroke="#8b5cf6" stroke-width="2"
+                        stroke-dasharray="6,4" marker-end="url(#arr-purple-f)" />
+                    <rect x="740" y="240" width="220" height="60" fill="#fdf4ff" stroke="#c084fc" stroke-width="2"
+                        rx="8" filter="url(#shadow-md)" />
+                    <text x="850" y="275" fill="#7e22ce" font-size="16" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">更多第三方/定制 SDK...</text>
+
+                    <!-- Ecosystem Badge -->
+                    <rect x="585" y="188" width="100" height="24" fill="#ffffff" stroke="#e9d5ff" stroke-width="1.5"
+                        rx="12" />
+                    <text x="635" y="204" fill="#6d28d9" font-size="12" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">生态泛化能力</text>
+
+                    <text x="840" y="380" fill="#1e293b" font-size="16" font-weight="bold" text-anchor="middle"
+                        font-family="Noto Sans SC">2. 多态 Agent 生态接入</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -2,8 +2,8 @@ site_name: by-framework
 site_description: 分布式高性能 Agent 调度框架（Python / Java / TypeScript）
 site_author: byai team
 
-repo_url: https://github.com/beyonai/by-framework-samples
-repo_name: beyonai/by-framework-samples
+repo_url: https://github.com/beyonai/by-framework-docs
+repo_name: beyonai/by-framework-docs
 
 theme:
   name: material
@@ -27,6 +27,7 @@ theme:
     - navigation.trimming
     - navigation.sections
     - navigation.expand
+    - toc.integrate
     - search.suggest
     - search.highlight
     - content.code.copy
@@ -40,6 +41,16 @@ plugins:
       lang:
         - en
         - zh
+  - blog:
+      blog_dir: blog
+      post_dir: blog/posts
+      authors: true
+      authors_file: blog/.authors.yml
+      archive: true
+      categories: true
+      post_excerpt: optional
+      pagination_per_page: 10
+      blog_toc: true
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -101,6 +112,11 @@ nav:
       - libs/langgraph.md
       - libs/tracing.md
       - libs/history.md
+  - 博客:
+      - 博客首页: blog/index.md
+      - 分类: blog/categories.md
+      - 标签: blog/tags.md
+      - 归档: blog/archive.md
   - 资源:
       - resources/glossary.md
       - resources/faq.md
@@ -132,7 +148,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/beyonai/by-framework-samples
+      link: https://github.com/beyonai/by-framework-docs
 
 extra_javascript:
   - https://unpkg.com/mermaid@11/dist/mermaid.min.js

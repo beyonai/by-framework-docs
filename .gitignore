@@ -70,3 +70,5 @@ Thumbs.db
 target/
 # Java
 java/target/
+
+site
