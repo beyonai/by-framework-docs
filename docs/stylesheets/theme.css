@@ -1,0 +1,161 @@
+/* ---------------------------------------------
+   PURE MINIMALIST THEME OVERRIDES
+--------------------------------------------- */
+
+/* Light Mode Specifics (Default) */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #ffffff;
+  /* Pure white header */
+  --md-primary-fg-color--light: #f8fafc;
+  --md-primary-fg-color--dark: #e2e8f0;
+
+  --md-default-bg-color: #ffffff;
+  /* White background */
+  --md-default-fg-color: #334155;
+  /* Slate 700 text */
+  --md-default-fg-color--light: #64748b;
+  --md-default-fg-color--lightest: #e2e8f0;
+  /* Borders */
+
+  --md-accent-fg-color: #4f46e5;
+  /* Indigo 600 */
+}
+
+/* Slate (Dark Mode) Custom Palette */
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #000000;
+  /* Pure black header */
+  --md-primary-fg-color--light: #0f172a;
+  --md-primary-fg-color--dark: #000000;
+
+  --md-default-bg-color: #000000;
+  /* Pure black background */
+  --md-default-fg-color: #e2e8f0;
+  /* Slate 200 text */
+  --md-default-fg-color--light: #94a3b8;
+  --md-default-fg-color--lightest: #1e293b;
+  /* Borders */
+
+  --md-accent-fg-color: #6366f1;
+  /* Indigo 500 */
+}
+
+/* ---------------------------------------------
+   HEADER & TABS
+--------------------------------------------- */
+.md-header {
+  box-shadow: none !important;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.md-header__title {
+  color: var(--md-default-fg-color) !important;
+  /* Make sure title isn't white-on-white */
+  font-weight: 600;
+}
+
+/* Header buttons and links in light mode need to be visible */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  fill: var(--md-default-fg-color) !important;
+}
+
+.md-header__button {
+  color: var(--md-default-fg-color) !important;
+}
+
+.md-tabs {
+  background-color: var(--md-primary-fg-color) !important;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest) !important;
+}
+
+.md-tabs__link {
+  color: var(--md-default-fg-color--light) !important;
+}
+
+.md-tabs__link--active {
+  color: var(--md-accent-fg-color) !important;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------
+   BUTTONS
+--------------------------------------------- */
+.md-button {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.md-button--primary {
+  background-color: var(--md-accent-fg-color) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--md-accent-fg-color) !important;
+}
+
+.md-button--primary:hover {
+  background-color: transparent !important;
+  color: var(--md-accent-fg-color) !important;
+}
+
+.md-button:not(.md-button--primary) {
+  border: 1px solid var(--md-default-fg-color--lightest) !important;
+  color: var(--md-default-fg-color) !important;
+}
+
+.md-button:not(.md-button--primary):hover {
+  border-color: var(--md-default-fg-color) !important;
+}
+
+/* ---------------------------------------------
+   HERO SECTION OVERRIDES
+--------------------------------------------- */
+/* Clean, non-gradient text for minimalist approach */
+.tx-hero h1 {
+  color: var(--md-default-fg-color) !important;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* Code showcase styling */
+.code-showcase {
+  border: 1px solid var(--md-default-fg-color--lightest) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  background-color: var(--md-default-bg-color) !important;
+}
+
+/* Cards and Architecture Card styling */
+.grid.cards>ul>li,
+.arch-card {
+  background-color: transparent !important;
+  border: 1px solid var(--md-default-fg-color--lightest) !important;
+  transition: border-color 0.2s ease !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+.grid.cards>ul>li:hover,
+.arch-card:hover {
+  border-color: var(--md-accent-fg-color) !important;
+  transform: none !important;
+  /* No floating for minimalist */
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------
+   CODE BLOCKS & ADMONITIONS
+--------------------------------------------- */
+.highlight {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+}
+
+.md-typeset .admonition {
+  border-width: 1px 1px 1px 4px !important;
+  border-style: solid !important;
+  border-color: var(--md-default-fg-color--lightest) !important;
+  border-left-color: var(--md-admonition-bg-color) !important;
+  box-shadow: none !important;
+  border-radius: 6px !important;
+}
