@@ -21,8 +21,6 @@ graph TB
 
     注册阶段 --> 运行阶段
 
-    style PR fill:#fff3e0,stroke:#ef6c00
-    style PR2 fill:#fff3e0,stroke:#ef6c00
 ```
 
 ## 核心组件关系
@@ -59,7 +57,11 @@ classDiagram
         +tools: Map
         +prompts: Map
         +skills: Map
+        +callbacks: Map
+        +knowledge_bases: Map
+        +sub_agents: List
         +extra: Map
+        +on_conflict: string
     }
 
     class PluginRegistry {

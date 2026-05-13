@@ -9,7 +9,7 @@
 
 === "Java"
 
-    - Java 17+
+    - Java 21+
     - Maven 3.8+
     - Redis 7.0+
 
@@ -24,13 +24,11 @@
 === "Python"
 
     ```bash
-    cd by-framework-python
-    
-    # 使用 uv 安装（推荐）
-    uv sync
-    
-    # 或使用 pip
+    #使用 pip
     pip install by-framework
+
+    #使用 uv
+    uv add by-framework
     ```
 
 === "Java"
@@ -41,14 +39,14 @@
     <dependency>
         <groupId>com.iwhaleai.byai</groupId>
         <artifactId>by-framework</artifactId>
-        <version>0.2.6</version>
+        <version>0.2.7</version>
     </dependency>
     ```
 
 === "TypeScript"
 
     ```bash
-    npm install byclaw-gateway-sdk
+    npm install @byclaw/by-framework
     ```
 
 ## 启动 Redis
@@ -182,7 +180,7 @@ docker run -d -p 6379:6379 redis:7-alpine
     import {
         GatewayWorker, AgentContext, GatewayCommand,
         WorkerRegistry, runWorker, AskAgentCommand
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class MyAssistant extends GatewayWorker {
         getAgentTypes(): string[] {
@@ -296,7 +294,7 @@ docker run -d -p 6379:6379 redis:7-alpine
     创建 `send_task.ts`：
 
     ```typescript
-    import { ByaiGatewayClient, initRedis, closeRedis } from 'byclaw-gateway-sdk';
+    import { ByaiGatewayClient, initRedis, closeRedis } from '@byclaw/by-framework';
 
     async function sendTask() {
         const redis = initRedis({ host: "localhost", port: 6379 });

@@ -32,6 +32,7 @@ uv run python orchestrator.py
 > “请反转字符串：**Hello MultiProcess**”
 
 ## 🔍 观察点
+
 -   在 **Orchestrator** 的终端中，你会看到 `[Decision] LLM 确认调用工具`。
 -   在 **SubWorker** 的终端中，紧接着会出现 `[Sub-worker] 🔨 接收到计算任务`。
 -   计算完成后，**SubWorker** 完成任务，**Orchestrator** 接收到 `ResumeCommand` 并输出最终结果。

@@ -47,9 +47,7 @@
             GatewayClient.SendResponse response = client.sendMessage(
                 "weather_agent",        // targetAgentType
                 "session_123",          // sessionId
-                "查询北京今天的天气",      // content
-                "user_123",             // userCode
-                "测试用户"               // userName
+                "查询北京今天的天气"       // content
             );
 
             if (response.isSuccess()) {
@@ -66,7 +64,7 @@
 === "TypeScript"
 
     ```typescript
-    import { ByaiGatewayClient, initRedis, closeRedis } from 'byclaw-gateway-sdk';
+    import { ByaiGatewayClient, initRedis, closeRedis } from '@byclaw/by-framework';
 
     async function main() {
         const redis = initRedis({ host: "localhost", port: 6379 });
@@ -118,7 +116,12 @@
         session_id: str,
         content: Any,
         user_code: str = "",
+        user_name: str = "",
         action_type: str = "ASK_AGENT",
+        parent_message_id: str = "",
+        message_id: Optional[str] = None,
+        trace_id: Optional[str] = None,
+        extra_payload: Optional[dict] = None,
         metadata: Optional[dict] = None,
         target_worker_id: Optional[str] = None,
         require_online_worker: bool = True,
@@ -129,7 +132,10 @@
         self,
         message_id: str,
         session_id: str,
-        reason: str = ""
+        reason: str = "",
+        target_agent_type: str = "",
+        requested_by: str = "client",
+        cancel_mode: str = "graceful",
     ) -> CancelTaskResponse:
         """取消指定的任务"""
     ```
@@ -144,10 +150,10 @@
         String userCode,
         String userName,
         ActionType actionType,
-        String targetWorkerId,
-        String parentMessageId,
-        String sourceAgentType,
-        Map<String, Object> extraPayload,
+        String taskId,
+        Object plan,
+        Object artifacts,
+        Map<String, Object> payload,
         Map<String, Object> metadata
     )
 

@@ -78,7 +78,7 @@
     import {
         Plugin, PluginManifest, PluginBuildContext,
         AgentConfig, AgentContext, GatewayWorker
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class WeatherPlugin extends Plugin {
         constructor() {
@@ -174,7 +174,7 @@
     **方式一：通过 pluginList 参数传入**
 
     ```typescript
-    import { runWorker } from 'byclaw-gateway-sdk';
+    import { runWorker } from '@byclaw/by-framework';
 
     runWorker(MyAssistant, {
         workerId: "worker-01",
@@ -214,3 +214,6 @@
 | `onTaskComplete` | 任务成功完成时调用 |
 | `onTaskError` | 任务出错时调用 |
 | `onTaskCancel` | 任务取消时调用 |
+| `onCallAgentStart` | 调用其他 Agent 开始时调用 |
+| `onCallAgentComplete` | 调用其他 Agent 完成时调用 |
+| `onCallAgentError` | 调用其他 Agent 出错时调用 |

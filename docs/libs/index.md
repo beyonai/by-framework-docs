@@ -7,6 +7,7 @@
 | 功能 | 说明 | 支持语言 |
 |------|------|----------|
 | [LangGraph 集成](langgraph.md) | 使用 LangGraph 定义复杂的 Agent 工作流 | Python, TypeScript |
+| [ADK 集成 (by-framework-adk)](adk.md) | 将 Google ADK Agent 接入 by-framework，自动桥接 SSE 事件流 | Python |
 | [链路追踪 (Tracing)](tracing.md) | 集成 Langfuse, Arize Phoenix 等观测平台 | Python, Java, TS |
 | [状态与记忆 (History)](history.md) | 基于 Postgres, Redis 的对话历史持久化 | Python, Java |
 

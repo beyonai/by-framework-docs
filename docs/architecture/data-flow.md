@@ -20,8 +20,6 @@ graph TB
     Backend --> Frontend
     Worker --> CtrlStream
 
-    style CtrlStream fill:#fff3e0,stroke:#f57c00
-    style DataStream fill:#e3f2fd,stroke:#1565c0
 ```
 
 ## 控制流 vs 数据流
@@ -46,8 +44,6 @@ graph LR
     Worker --> LayerData
     LayerData --> Consumer["Backend"]
 
-    style LayerCtrl fill:#fff3e0,stroke:#ef6c00
-    style LayerData fill:#e3f2fd,stroke:#1565c0
 ```
 
 ### 控制流 (Control Stream)

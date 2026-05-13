@@ -25,14 +25,12 @@ public abstract class GatewayWorker {
     public abstract Object processCommand(GatewayCommand command, AgentContext context);
 }
 
-### 结果处理机制
-
 `processCommand` 返回值支持灵活的数据类型，框架会自动规范化：
+
 - **String**: 自动填充到 `content` 或 `replyData`。
 - **Map / JSON Node**: 自动解析 `status`、`content`、`replyData`、`metadata` 等字段。
 - **自定义对象**: 解析序列化后返回。
 结束时框架如果检测到有最终结果，会自动下发 `finalAnswer` 事件。
-```
 
 ---
 
@@ -58,8 +56,24 @@ public abstract class GatewayWorker {
 
 ### Agent 间调用
 
-- `callAgent(String target, String content)`: 简易异步调用。
-- `callAgent(String target, String content, Map payload, boolean waitForReply, Map metadata)`: 完整参数调用。
+```java
+// 简易异步调用
+Map<String, Object> result = context.callAgent(
+    "target_agent_type",  // targetAgentType
+    "content"             // content
+);
+
+// 完整参数调用
+Map<String, Object> result = context.callAgent(
+    "target_agent_type",  // targetAgentType
+    "content",            // content
+    Map.of("key", "val"), // extraPayload
+    true,                 // waitForReply
+    Map.of(),             // metadata
+    "custom_msg_id",      // messageId (nullable)
+    "parent_msg_id"       // parentMessageId (nullable)
+);
+```
 
 ### 任务组 (Scatter-Gather)
 

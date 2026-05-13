@@ -1,0 +1,36 @@
+/* Enable zoom cursor for mermaid diagrams */
+.mermaid {
+  cursor: zoom-in;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Fullscreen expanded state */
+.mermaid.fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 99999 !important;
+  background-color: var(--md-default-bg-color) !important;
+  overflow: auto !important; /* 支持滚动 */
+  display: block !important;
+  text-align: center !important;
+  cursor: zoom-out !important;
+  padding: 3rem !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+
+/* 解除原本的 max-width 限制，允许超出屏幕以支持滚动 */
+.mermaid.fullscreen svg {
+  max-width: none !important;
+  max-height: none !important;
+  width: auto !important;
+  height: auto !important;
+  /* 可选：为了保证看得清，如果是特别宽的长图，保持最小阅读宽度 */
+  min-width: 100% !important;
+  margin: 0 auto !important;
+}

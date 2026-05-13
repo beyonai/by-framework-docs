@@ -11,6 +11,7 @@
 | `message_id` | `str` | 消息ID |
 | `parent_message_id` | `str` | 父消息ID |
 | `current_agent_id` | `str` | 当前Agent ID |
+| `agent_runtime_state` | `AgentRuntimeState` | Agent 运行时状态 |
 
 ### 方法
 
@@ -97,4 +98,32 @@ async def collect_group_results(
 ```python
 async def get_active_workers(self) -> Dict[str, Any]:
     """获取集群中所有活跃的 worker"""
+```
+
+#### flush_to_history
+
+```python
+async def flush_to_history(self) -> None:
+    """将当前会话历史刷新到持久化存储"""
+```
+
+#### check_cancelled
+
+```python
+async def check_cancelled(self) -> None:
+    """如果任务已被取消则抛出 asyncio.CancelledError"""
+```
+
+#### is_cancel_requested
+
+```python
+def is_cancel_requested(self) -> bool:
+    """返回任务是否已被请求取消"""
+```
+
+#### update_execution_state
+
+```python
+async def update_execution_state(self, status: str) -> None:
+    """更新当前执行状态"""
 ```

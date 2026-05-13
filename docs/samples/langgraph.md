@@ -126,7 +126,7 @@ by-framework 与 LangGraph 深度集成，核心模式是：
     import {
         GatewayWorker, AgentContext, GatewayCommand,
         AskAgentCommand, ResumeCommand, runWorker
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
     import { StateGraph, START, END, MemorySaver } from '@langchain/langgraph';
     import { ChatOpenAI } from '@langchain/openai';
     import { ToolNode } from '@langchain/langgraph/prebuilt';

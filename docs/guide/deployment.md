@@ -14,14 +14,14 @@
 === "Java"
 
     ```bash
-    cd byclaw-gateway-sdk-java
+    cd by-framework-java
     mvn clean install -DskipTests
     ```
 
 === "TypeScript"
 
     ```bash
-    npm install byclaw-gateway-sdk
+    npm install @byclaw/by-framework
     npm run build
     ```
 

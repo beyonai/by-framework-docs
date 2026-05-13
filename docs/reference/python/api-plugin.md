@@ -40,8 +40,35 @@ class Plugin:
     ) -> None:
         """任务出错时调用"""
 
-    async def on_task_cancel(self, context: AgentContext) -> None:
+    async def on_task_cancel(
+        self,
+        context: AgentContext,
+        command: CancelTaskCommand,
+    ) -> None:
         """任务取消时调用"""
+
+    async def on_call_agent_start(
+        self,
+        context: AgentContext,
+        command: AskAgentCommand,
+    ) -> None:
+        """调用其他 Agent 开始时调用"""
+
+    async def on_call_agent_complete(
+        self,
+        context: AgentContext,
+        command: AskAgentCommand,
+        result: Any,
+    ) -> None:
+        """调用其他 Agent 完成时调用"""
+
+    async def on_call_agent_error(
+        self,
+        context: AgentContext,
+        command: AskAgentCommand,
+        error: Exception,
+    ) -> None:
+        """调用其他 Agent 出错时调用"""
 
     async def register_agent_configs(
         self,
@@ -56,7 +83,9 @@ class Plugin:
 @dataclass
 class PluginManifest:
     plugin_id: str
-    version: str
+    version: str = "1.0.0"
+    priority: int = 0
+    enabled: bool = True
     name: Optional[str] = None
     description: Optional[str] = None
 ```
@@ -78,9 +107,16 @@ class PluginBuildContext:
 @dataclass
 class AgentConfig:
     agent_id: str
+    name: str = ""
+    description: str = ""
     tools: Optional[Dict[str, Callable]] = None
     prompts: Optional[Dict[str, str]] = None
-    skills: Optional[List[str]] = None
+    skills: Optional[Dict[str, Any]] = None
+    callbacks: Optional[Dict[str, List[Callable]]] = None
+    knowledge_bases: Optional[Dict[str, Any]] = None
+    sub_agents: Optional[List[str]] = None
+    extra: Optional[Dict[str, Any]] = None
+    on_conflict: str = "error"
 ```
 
 ## PluginRegistry

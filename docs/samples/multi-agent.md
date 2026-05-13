@@ -90,7 +90,7 @@
     import {
         GatewayWorker, AgentContext, GatewayCommand,
         AskAgentCommand, runWorker
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class SubWorker extends GatewayWorker {
         getAgentTypes(): string[] {

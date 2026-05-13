@@ -9,7 +9,7 @@ TypeScript SDK 采用类 Python 的异步编程模型，深度适配 Node.js 生
 ### 核心方法
 
 ```typescript
-import { GatewayWorker, GatewayCommand, AgentContext } from 'byclaw-gateway-sdk';
+import { GatewayWorker, GatewayCommand, AgentContext } from '@byclaw/by-framework';
 
 class MyWorker extends GatewayWorker {
   /**
@@ -82,6 +82,33 @@ const results = await context.collectGroupResults(taskGroupId);
 - `isCancelRequested()`: 返回 `boolean`。
 - `await checkCancelled()`: 如果已取消则抛出 `TaskCancelledError`。
 
+### 配置管理
+
+```typescript
+// 设置 Agent 配置
+context.setAgentConfigs([config1, config2]);
+
+// 获取单个 Agent 配置
+const config = context.getAgentConfig("my_agent_id");
+
+// 列出所有 Agent 配置
+const allConfigs = context.listAgentConfigs();
+```
+
+### 工具调用
+
+```typescript
+// 调用工具
+const result = await context.callTool("tool_name", { arg1: "value" });
+```
+
+### 状态管理
+
+```typescript
+// 更新执行状态
+await context.updateExecutionState("running");
+```
+
 ---
 
 ## runWorker
@@ -89,7 +116,7 @@ const results = await context.collectGroupResults(taskGroupId);
 快捷启动辅助函数。
 
 ```typescript
-import { runWorker } from 'byclaw-gateway-sdk';
+import { runWorker } from '@byclaw/by-framework';
 
 runWorker(MyWorker, {
   workerId: "ts-worker-01",

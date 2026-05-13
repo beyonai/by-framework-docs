@@ -26,8 +26,6 @@ graph LR
     Worker --> 事件
     事件 -->|"Data Stream<br/>byai_gateway:session:{sid}:data_stream"| Consumer["Backend"]
 
-    style 命令 fill:#e8f5e9,stroke:#2e7d32
-    style 事件 fill:#e3f2fd,stroke:#1565c0
 ```
 
 ## 命令 (Commands)
@@ -114,7 +112,7 @@ classDiagram
 === "TypeScript"
 
     ```typescript
-    import { AskAgentCommand, MessageHeader } from 'byclaw-gateway-sdk';
+    import { AskAgentCommand, MessageHeader } from '@byclaw/by-framework';
 
     const command = new AskAgentCommand(
         new MessageHeader("msg_123", "sess_456", "trace_789", {

@@ -6,20 +6,20 @@
 mindmap
   root((Redis Streams))
     持久化
-      消息落盘不丢失
-      AOF / RDB 持久化
+      ["消息落盘不丢失"]
+      ["AOF / RDB 持久化"]
     消费组
-      Consumer Group 竞争消费
-      自动负载均衡
+      ["Consumer Group 竞争消费"]
+      ["自动负载均衡"]
     范围查询
-      按 ID 范围读取历史
-      支持 XRANGE / XREVRANGE
+      ["按 ID 范围读取历史"]
+      ["支持 XRANGE / XREVRANGE"]
     ACK 机制
-      PEL 待确认列表
-      未 ACK 自动重投
+      ["PEL 待确认列表"]
+      ["未 ACK 自动重投"]
     高性能
-      单分区 O(1) 写入
-      支持批量读取
+      ["单分区 O(1) 写入"]
+      ["支持批量读取"]
 ```
 
 ## 完整 Redis Key 参考
@@ -102,8 +102,6 @@ graph TB
     Client -->|"targetAgentType"| S1
     Client -.->|"targetWorkerId"| S2
 
-    style AgentTypeRoute fill:#e8f5e9,stroke:#2e7d32
-    style DirectRoute fill:#fff3e0,stroke:#ef6c00
 ```
 
 ### Agent Type 路由 (默认)
@@ -193,5 +191,4 @@ graph LR
     registry --> reg_at["agent_type:*"]
     registry --> reg_exec["execution:*"]
 
-    style Root fill:#ffeb3b,stroke:#f57f17
 ```

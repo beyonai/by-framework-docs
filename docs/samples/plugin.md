@@ -63,10 +63,10 @@
     // 示例：在启动时注册监控回调
     WorkerRunner runner = new WorkerRunner(worker);
     runner.onTaskStart(context -> {
-        System.out.println("[插件钩子] 任务 " + context.getMessageId() + " 开始执行");
+        System.out.println("[插件钩子] 任务 " + context.getCurrentMessageId() + " 开始执行");
     });
     runner.onTaskComplete((context, result) -> {
-        System.out.println("[插件钩子] 任务 " + context.getMessageId() + " 完成");
+        System.out.println("[插件钩子] 任务 " + context.getCurrentMessageId() + " 完成");
     });
     ```
 
@@ -75,7 +75,7 @@
     ```typescript
     import {
         Plugin, PluginBuildContext, AgentConfig, AgentContext, GatewayWorker
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class LoggingPlugin extends Plugin {
         private startTimes: Map<string, number> = new Map();
@@ -133,7 +133,7 @@
 === "TypeScript"
 
     ```typescript
-    import { runWorker } from 'byclaw-gateway-sdk';
+    import { runWorker } from '@byclaw/by-framework';
 
     runWorker(EchoWorker, {
         workerId: "echo-worker-1",

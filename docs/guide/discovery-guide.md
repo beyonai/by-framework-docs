@@ -30,14 +30,14 @@
     import com.iwhaleai.byai.framework.core.discovery.ServiceRegistry;
 
     ServiceRegistry registry = new ServiceRegistry(redisClient);
-    registry.register("my-service", "192.168.1.100", 8080);
+    registry.register("my-service", "http", "192.168.1.100", 8080, "/api", 1, null, 30);
     // 心跳自动通过后台线程维护
     ```
 
 === "TypeScript"
 
     ```typescript
-    import { ServiceRegistry } from 'byclaw-gateway-sdk';
+    import { ServiceRegistry } from '@byclaw/by-framework';
 
     const registry = new ServiceRegistry(redis);
     await registry.register({
@@ -75,7 +75,7 @@
 === "TypeScript"
 
     ```typescript
-    import { DiscoveryClient } from 'byclaw-gateway-sdk';
+    import { DiscoveryClient } from '@byclaw/by-framework';
 
     const discovery = new DiscoveryClient(redis, 5);  // 5秒缓存
     const endpoints = await discovery.getInstances("my-service");
@@ -116,7 +116,7 @@
 === "TypeScript"
 
     ```typescript
-    import { DiscoveryHttpClient, DiscoveryClient } from 'byclaw-gateway-sdk';
+    import { DiscoveryHttpClient, DiscoveryClient } from '@byclaw/by-framework';
 
     const discoveryClient = new DiscoveryClient(redis);
     const httpClient = new DiscoveryHttpClient({ discoveryClient });

@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "langfuse>=4.3.1",
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0",
 ]
 
 [tool.uv.workspace]
@@ -20,6 +23,7 @@ members = [
     "python/workers/langgraph-file-worker",
     "python/workers/langgraph-multimodal-worker",
     "python/workers/langgraph-extension-worker",
+    "python/workers/adk-worker",
     "python/discovery",
     "python/plugins",
 ]
@@ -30,3 +34,4 @@ by-framework-langgraph = { path = "/Users/xiaozhongcheng/data/company/beyonai/by
 by-framework-history-byclaw = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-byclaw", editable = true }
 by-framework-history-postgres = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-history-postgres", editable = true }
 by-framework-trace-langfuse = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-trace-langfuse", editable = true }
+by-framework-adk = { path = "/Users/xiaozhongcheng/data/company/beyonai/by-framework-python/libs/by-framework-adk", editable = true }

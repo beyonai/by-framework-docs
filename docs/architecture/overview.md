@@ -47,9 +47,6 @@ graph TB
 
     DataStream --> Backend --> Frontend
 
-    style LayerRedis fill:#fee,stroke:#c33
-    style LayerAccess fill:#e8f5e9,stroke:#2e7d32
-    style LayerExecution fill:#e3f2fd,stroke:#1565c0
 ```
 
 ## 核心组件
@@ -115,10 +112,6 @@ graph LR
 
     L1 --> L2 --> L3 --> L4
 
-    style L1 fill:#e8f5e9
-    style L2 fill:#fff3e0
-    style L3 fill:#e3f2fd
-    style L4 fill:#fce4ec
 ```
 
 ### ① 接入层

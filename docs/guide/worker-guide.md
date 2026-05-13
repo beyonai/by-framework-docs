@@ -46,7 +46,7 @@
         context.emitChunk("正在处理...");
 
         // 2. 获取消息 ID 和会话 ID
-        String msgId = context.getMessageId();
+        String msgId = context.getCurrentMessageId();
         String sessionId = context.getSessionId();
 
         // 3. 调用其他 Agent
@@ -168,7 +168,7 @@
 === "TypeScript"
 
     ```typescript
-    import { GatewayWorker, AgentContext, GatewayCommand, runWorker } from 'byclaw-gateway-sdk';
+    import { GatewayWorker, AgentContext, GatewayCommand, runWorker } from '@byclaw/by-framework';
 
     class StreamingAgent extends GatewayWorker {
         getAgentTypes(): string[] {
@@ -252,7 +252,7 @@ Worker 可以通过 `context.askUser(...)` 挂起执行并等待用户输入。�
     import {
         GatewayWorker, AgentContext, GatewayCommand,
         ResumeCommand, AskUserEvent
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class ApprovalAgent extends GatewayWorker {
         getAgentTypes(): string[] {

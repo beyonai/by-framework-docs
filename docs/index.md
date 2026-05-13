@@ -133,7 +133,6 @@ graph TD
     
     DS --> BE
     
-    style MessagingLayer fill:#f9f9f9,stroke:#333,stroke-dasharray: 5,5
 ```
 
 ---
@@ -166,6 +165,30 @@ graph TD
 
 ## 📦 SDK 支持情况
 
-- **Python SDK**: 稳定版，支持 LangGraph 集成与全插件生态。
-- **Java SDK**: 企业版，深度集成 Spring Boot，适用于高性能生产环境。
-- **TypeScript SDK**: 轻量版，支持 Node.js ESM，适配 LangGraph.js。
+<div class="grid cards" markdown>
+
+-   :fontawesome-brands-python: **Python SDK**
+
+    ---
+
+    稳定版，支持 LangGraph 集成、Google ADK 集成与全插件生态。
+
+    [:octicons-mark-github-16: by-framework-python](https://github.com/beyonai/by-framework-python)
+
+-   :fontawesome-brands-java: **Java SDK**
+
+    ---
+
+    企业版，深度集成 Spring Boot，适用于高性能生产环境。
+
+    [:octicons-mark-github-16: by-framework-java](https://github.com/beyonai/by-framework-java)
+
+-   :material-language-typescript: **TypeScript SDK**
+
+    ---
+
+    轻量版，支持 Node.js ESM，适配 LangGraph.js。
+
+    [:octicons-mark-github-16: by-framework-ts](https://github.com/beyonai/by-framework-ts)
+
+</div>

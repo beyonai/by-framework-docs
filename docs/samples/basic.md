@@ -75,7 +75,7 @@
     import {
         GatewayWorker, AgentContext, GatewayCommand,
         AskAgentCommand, runWorker
-    } from 'byclaw-gateway-sdk';
+    } from '@byclaw/by-framework';
 
     class EchoWorker extends GatewayWorker {
         getAgentTypes(): string[] {
@@ -158,7 +158,7 @@
 === "TypeScript"
 
     ```typescript
-    import { ByaiGatewayClient, initRedis, closeRedis } from 'byclaw-gateway-sdk';
+    import { ByaiGatewayClient, initRedis, closeRedis } from '@byclaw/by-framework';
 
     async function send() {
         const redis = initRedis({

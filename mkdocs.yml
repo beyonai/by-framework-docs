@@ -2,11 +2,12 @@ site_name: by-framework
 site_description: 分布式高性能 Agent 调度框架（Python / Java / TypeScript）
 site_author: byai team
 
-repo_url: https://github.com/beyonai/by-framework-docs
-repo_name: beyonai/by-framework-docs
+repo_url: https://github.com/beyonai
+repo_name: beyonai
 
 theme:
   name: material
+  custom_dir: overrides
   language: zh
   palette:
     - scheme: default
@@ -98,8 +99,16 @@ nav:
           - reference/python/api-plugin.md
       - Java:
           - reference/java/api-worker.md
+          - reference/java/api-context.md
+          - reference/java/api-client.md
+          - reference/java/api-protocol.md
+          - reference/java/api-plugin.md
       - TypeScript:
           - reference/typescript/api-worker.md
+          - reference/typescript/api-context.md
+          - reference/typescript/api-client.md
+          - reference/typescript/api-protocol.md
+          - reference/typescript/api-plugin.md
   - 示例:
       - samples/index.md
       - samples/basic.md
@@ -110,6 +119,7 @@ nav:
   - 库文档:
       - libs/index.md
       - libs/langgraph.md
+      - libs/adk.md
       - libs/tracing.md
       - libs/history.md
   - 博客:
@@ -145,10 +155,8 @@ markdown_extensions:
   - toc:
       permalink: true
 
-extra:
-  social:
-    - icon: fontawesome/brands/github
-      link: https://github.com/beyonai/by-framework-docs
+extra_css:
+  - stylesheets/mermaid-zoom.css
 
 extra_javascript:
-  - https://unpkg.com/mermaid@11/dist/mermaid.min.js
+  - javascripts/mermaid-zoom.js
