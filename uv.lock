@@ -22,6 +22,7 @@ members = [
     "langgraph-multimodal-worker",
     "langgraph-worker",
     "multi-workers",
+    "route-policy-worker",
 ]
 
 [[package]]
@@ -35,7 +36,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework-adk", editable = "../by-framework-python/libs/by-framework-adk" },
+    { name = "by-framework-adk", specifier = ">=0.0.1" },
     { name = "litellm" },
 ]
 
@@ -54,7 +55,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
+    { name = "by-framework" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -328,7 +329,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
+    { name = "by-framework" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
     { name = "redis", specifier = ">=7.0.0" },
 ]
@@ -336,123 +337,70 @@ requires-dist = [
 [[package]]
 name = "by-framework"
 version = "0.2.0"
-source = { editable = "../by-framework-python" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
     { name = "httpx" },
     { name = "redis" },
     { name = "typing-extensions" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "dill", specifier = ">=0.4.1" },
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.0" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "pyink", marker = "extra == 'dev'", specifier = ">=24.0.0" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
-    { name = "redis", specifier = ">=7.0.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
-    { name = "typing-extensions", specifier = ">=4.0.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/6c/c0/f7b668dfd3f04a93f729386688be1b8f98011395f2db559d0cc0055e138b/by_framework-0.2.0.tar.gz", hash = "sha256:b0369fca424f67c49b6194921f634bc44e61344a6ea0db0f5d2906a29075f749", size = 262666, upload-time = "2026-05-13T03:44:58.183Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/82/16/d7e622501f00c399c6078e5b4d8839ddc517cabede25c9a1bd7a724f77b8/by_framework-0.2.0-py3-none-any.whl", hash = "sha256:90f803892f002811ebaa54c54a9ccbc5870848c75de41745b1766023ca5a41a4", size = 126875, upload-time = "2026-05-13T03:44:56.595Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "by-framework-adk"
 version = "0.0.1"
-source = { editable = "../by-framework-python/libs/by-framework-adk" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "by-framework" },
     { name = "google-adk" },
     { name = "google-genai" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "google-adk" },
-    { name = "google-genai" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.0" },
-    { name = "pyink", marker = "extra == 'dev'", specifier = ">=24.0.0" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/d8/67/44daca0f0e345e81f32b7794681b976468a709ac537acf29922e86d5b4aa/by_framework_adk-0.0.1.tar.gz", hash = "sha256:3806592de9d1eff8288152729d9a713676d12e7a0ffedc68a074f1014e654f9d", size = 4813, upload-time = "2026-05-15T08:21:18.587Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/5d/fd65b8f659699299807cd0f9b5efd22903359b3f42799844caa26a3143c3/by_framework_adk-0.0.1-py3-none-any.whl", hash = "sha256:75ae08d7e3986b4f2c77b62d02bcc06b18ed339b32adee731844cd89d441cf77", size = 5524, upload-time = "2026-05-15T08:21:17.238Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "by-framework-history-byclaw"
 version = "0.0.1"
-source = { editable = "../by-framework-python/libs/by-framework-history-byclaw" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "by-framework" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.0" },
-    { name = "pyink", marker = "extra == 'dev'", specifier = ">=24.0.0" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/0b/36/fb98e14a304fe849c22277bf6cf6771175aa71a9ab0d543bc58706338a50/by_framework_history_byclaw-0.0.1.tar.gz", hash = "sha256:a3aaccb98937a3ab5b965fb514a0d93d9ee167a0e88e0e6b924c152fcd25de7e", size = 4715, upload-time = "2026-05-13T04:25:03.61Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/23/f5/db7a1201b26da193f2765f1c1a278e79c2cf25a67e1d599a9216b1f9e8b2/by_framework_history_byclaw-0.0.1-py3-none-any.whl", hash = "sha256:fdc10456ba6bb2c9588da193a9fd2498511dcb94a1a023608e442e51bac413ed", size = 3941, upload-time = "2026-05-13T04:25:02.514Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "by-framework-history-postgres"
 version = "0.0.1"
-source = { editable = "../by-framework-python/libs/by-framework-history-postgres" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asyncpg" },
     { name = "by-framework" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "asyncpg", specifier = ">=0.29.0" },
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.0" },
-    { name = "pyink", marker = "extra == 'dev'", specifier = ">=24.0.0" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/a1/42/b37d077dbf438c8533d30e5063e459bc0dc5bad5bc14b655f28b826f444f/by_framework_history_postgres-0.0.1.tar.gz", hash = "sha256:0d3a23122bd55937f65ad8ba782f459bb2f3e29f572017d997289a053bc4c2aa", size = 3761, upload-time = "2026-05-13T04:24:31.664Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/1d/5d8942000798bd734db3e1ad2e3a60ea97e274c0af35e476ea73234c087b/by_framework_history_postgres-0.0.1-py3-none-any.whl", hash = "sha256:4d06253ba2b16215fe30f2c4f1597e7d5cdcaf84b15e9bb8838812a0bd153c8e", size = 3580, upload-time = "2026-05-13T04:24:30.481Z" },
 ]
-provides-extras = ["dev"]
 
 [[package]]
 name = "by-framework-langgraph"
 version = "0.0.1"
-source = { editable = "../by-framework-python/libs/by-framework-langgraph" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "by-framework" },
     { name = "langchain-core" },
     { name = "langgraph" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-trace-langfuse", marker = "extra == 'langfuse'", editable = "../by-framework-python/libs/by-framework-trace-langfuse" },
-    { name = "by-framework-trace-phoenix", marker = "extra == 'phoenix'", editable = "../by-framework-python/libs/by-framework-trace-phoenix" },
-    { name = "isort", marker = "extra == 'dev'", specifier = ">=5.13.0" },
-    { name = "langchain-core", specifier = ">=1.2.28" },
-    { name = "langgraph", specifier = ">=1.1.6" },
-    { name = "openinference-instrumentation-langchain", marker = "extra == 'phoenix'", specifier = ">=0.1.0" },
-    { name = "openinference-instrumentation-openai", marker = "extra == 'phoenix'", specifier = ">=0.1.0" },
-    { name = "pyink", marker = "extra == 'dev'", specifier = ">=24.0.0" },
-    { name = "pylint", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.3.0" },
+sdist = { url = "https://files.pythonhosted.org/packages/df/7f/e877693a0b9808d3e9eac569989992f153ad2a7cf3c0678ad2aca9e78f56/by_framework_langgraph-0.0.1.tar.gz", hash = "sha256:571a694d1f089a924493d74d7287676578fcac34eaf133b00ad2f3eb0dc93249", size = 12467, upload-time = "2026-05-13T04:26:27.931Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/2e/d0bb28b183d1a6f9f990e0eb1ed163987bcc908557024c86177b9503aee7/by_framework_langgraph-0.0.1-py3-none-any.whl", hash = "sha256:c5c34b87dae8b66e9c77b05436bcb784299c33d562ef98d2d16cd017fe9b8050", size = 11333, upload-time = "2026-05-13T04:26:26.87Z" },
 ]
-provides-extras = ["dev", "langfuse", "phoenix"]
 
 [[package]]
 name = "by-framework-samples"
@@ -485,7 +433,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
+    { name = "by-framework" },
     { name = "langchain-core", specifier = ">=0.1.0" },
     { name = "python-dotenv", specifier = ">=1.0.0" },
 ]
@@ -502,7 +450,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
+    { name = "by-framework" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "redis", specifier = ">=7.4.0" },
 ]
@@ -677,8 +625,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-postgres", editable = "../by-framework-python/libs/by-framework-history-postgres" },
+    { name = "by-framework" },
+    { name = "by-framework-history-postgres" },
     { name = "claude-agent-sdk", specifier = ">=0.1.0" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
     { name = "redis", specifier = ">=7.4.0" },
@@ -1727,9 +1675,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
-    { name = "by-framework-history-postgres", editable = "../by-framework-python/libs/by-framework-history-postgres" },
+    { name = "by-framework" },
+    { name = "by-framework-history-byclaw" },
+    { name = "by-framework-history-postgres" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -2076,9 +2024,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
-    { name = "by-framework-langgraph", editable = "../by-framework-python/libs/by-framework-langgraph" },
+    { name = "by-framework" },
+    { name = "by-framework-history-byclaw" },
+    { name = "by-framework-langgraph" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -2100,8 +2048,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
+    { name = "by-framework" },
+    { name = "by-framework-history-byclaw" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -2124,8 +2072,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
+    { name = "by-framework" },
+    { name = "by-framework-history-byclaw" },
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
@@ -2174,8 +2122,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
-    { name = "by-framework-history-byclaw", editable = "../by-framework-python/libs/by-framework-history-byclaw" },
+    { name = "by-framework", specifier = ">=0.1.2" },
+    { name = "by-framework-history-byclaw" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -2580,7 +2528,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "by-framework", editable = "../by-framework-python" },
+    { name = "by-framework" },
     { name = "langchain-core", specifier = ">=1.2.28" },
     { name = "langchain-openai", specifier = ">=1.1.12" },
     { name = "langgraph", specifier = ">=1.1.6" },
@@ -3619,6 +3567,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
+]
+
+[[package]]
+name = "route-policy-worker"
+version = "0.1.0"
+source = { virtual = "python/workers/route-policy-worker" }
+dependencies = [
+    { name = "by-framework" },
+    { name = "python-dotenv" },
+    { name = "redis" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "by-framework" },
+    { name = "python-dotenv", specifier = ">=1.2.2" },
+    { name = "redis", specifier = ">=7.4.0" },
 ]
 
 [[package]]

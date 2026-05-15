@@ -1,0 +1,11 @@
+[project]
+name = "route-policy-worker"
+version = "0.1.0"
+description = "Route policy worker and wakeup controller samples for by-framework"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "by-framework",
+    "python-dotenv>=1.2.2",
+    "redis>=7.4.0",
+]

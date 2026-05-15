@@ -137,6 +137,7 @@ async def chat_with_agent(
     session_id: str,
     user_input: str,
     target_worker_id: Optional[str] = None,
+    timeout_seconds: int = 60,
 ):
     """发送消息测试的业务逻辑"""
     logger.info(f"同步发送消息到 {target_worker_id or target_agent_type}: '{user_input}'")
@@ -146,7 +147,8 @@ async def chat_with_agent(
         session_id=session_id,
         target_agent_type=target_agent_type,
         content=user_input,
-        target_worker_id=target_worker_id
+        target_worker_id=target_worker_id,
+        timeout_seconds=timeout_seconds,
     )
     
     if final_answer is not None:
@@ -160,10 +162,16 @@ async def main():
     redis_username = os.getenv("BYAI_REDIS_USERNAME")
     redis_password = os.getenv("BYAI_REDIS_PASSWORD")
     
-    # 目标 Agent 类型 (参考 workers/langgraph-worker/main.py 中的 get_capabilities)
-    target_worker_id = "langgraph-worker-1"
-    target_agent_type = "langgraph-extension-demo"
+    # 目标 Agent 类型，可通过环境变量覆盖。
+    # 例如：
+    # BYAI_TARGET_AGENT_TYPE=route-policy-orchestrator-agent uv run python main.py
+    target_worker_id = os.getenv("BYAI_TARGET_WORKER_ID") or None
+    target_agent_type = os.getenv(
+        "BYAI_TARGET_AGENT_TYPE", "langgraph-extension-demo"
+    )
     session_id = f"session_{uuid.uuid4().hex[:8]}"
+    user_input = os.getenv("BYAI_MESSAGE", "你好，请自我介绍一下。")
+    timeout_seconds = int(os.getenv("BYAI_TIMEOUT_SECONDS", "60"))
     
     logger.info(f"正在连接 Redis: {redis_host}:{redis_port} (DB: {redis_db})")
     
@@ -186,13 +194,13 @@ async def main():
     sync_client = SyncGatewayClient(client=client, redis_client=redis_client)
     
     # 3. 发送消息测试
-    user_input = "你好，请自我介绍一下。"
     await chat_with_agent(
         sync_client=sync_client,
         target_agent_type=target_agent_type,
-        # target_worker_id=target_worker_id,
+        target_worker_id=target_worker_id,
         session_id=session_id,
-        user_input=user_input
+        user_input=user_input,
+        timeout_seconds=timeout_seconds,
     )
 
 if __name__ == "__main__":
