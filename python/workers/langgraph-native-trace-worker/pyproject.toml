@@ -1,0 +1,16 @@
+[project]
+name = "langgraph-native-trace-worker"
+version = "0.1.0"
+description = "Native LangGraph worker with by-framework trace integration (no LangGraphWorker base class)"
+requires-python = ">=3.12"
+dependencies = [
+    "by-framework",
+    "langgraph>=1.1.6",
+    "langchain-core>=1.2.28",
+    "langchain-openai>=1.1.12",
+    "python-dotenv>=1.0.1",
+    # 可选：Langfuse 追踪
+    "by-framework-trace-langfuse",
+    # 可选：Phoenix / Arize 追踪
+    # "by-framework-trace-phoenix",
+]

@@ -23,6 +23,7 @@ members = [
     "python/workers/langgraph-file-worker",
     "python/workers/langgraph-multimodal-worker",
     "python/workers/langgraph-extension-worker",
+    "python/workers/langgraph-native-trace-worker",    
     "python/workers/route-policy-worker",
     "python/workers/trace-demo-worker",
     "python/discovery",
