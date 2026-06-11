@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "by-framework>=0.1.2",
+    "by-framework-trace-langfuse",
     "by-framework-history-byclaw",
     "langgraph>=1.1.6",
     "langchain-core>=1.2.28",

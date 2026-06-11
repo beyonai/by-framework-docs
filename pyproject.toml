@@ -24,6 +24,16 @@ members = [
     "python/workers/langgraph-multimodal-worker",
     "python/workers/langgraph-extension-worker",
     "python/workers/route-policy-worker",
+    "python/workers/trace-demo-worker",
     "python/discovery",
     "python/plugins",
 ]
+
+[tool.uv.sources]
+by-framework = { path = "../by-framework-python", editable = true }
+by-framework-adk = { path = "../by-framework-python/libs/by-framework-adk", editable = true }
+by-framework-history-byclaw = { path = "../by-framework-python/libs/by-framework-history-byclaw", editable = true }
+by-framework-history-postgres = { path = "../by-framework-python/libs/by-framework-history-postgres", editable = true }
+by-framework-langgraph = { path = "../by-framework-python/libs/by-framework-langgraph", editable = true }
+by-framework-trace-langfuse = { path = "../by-framework-python/libs/by-framework-trace-langfuse", editable = true }
+by-framework-trace-phoenix = { path = "../by-framework-python/libs/by-framework-trace-phoenix", editable = true }

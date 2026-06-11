@@ -3,14 +3,13 @@ package com.beyonai.byframework.samples.examples;
 import com.iwhaleai.byai.framework.client.ByaiGatewayClient;
 import com.iwhaleai.byai.framework.client.GatewayClient;
 import com.iwhaleai.byai.framework.common.RedisClient;
-import com.iwhaleai.byai.framework.core.availability.AvailabilityStatus;
 import com.iwhaleai.byai.framework.core.availability.RoutePolicy;
 
 import java.util.UUID;
 
 /**
  * Java 版本的 route_policy 样例。
- * 演示如何使用新的 route_policy API 替代 require_online_worker 进行可用性控制。
+ * 演示如何使用最新的 RoutePolicy 策略进行可用性路由控制。
  *
  * <p>
  * 对标 Python 的 send_message_route_policy.py。
@@ -20,7 +19,7 @@ public class SendMessageRoutePolicyExample {
         private static final String FAIL_FAST_AGENT_TYPE = env("BYAI_FAIL_FAST_AGENT_TYPE",
                         env("BYAI_TARGET_AGENT_TYPE", "route-policy-online-agent"));
         private static final String WAKE_AND_WAIT_AGENT_TYPE = env("BYAI_WAKE_AND_WAIT_AGENT_TYPE",
-                        "route-policy-child-agent");
+                        "route-policy-wakeup-agent");
         private static final String WAKE_AND_QUEUE_AGENT_TYPE = env("BYAI_WAKE_AND_QUEUE_AGENT_TYPE",
                         "route-policy-queued-agent");
         private static final String SEND_ANYWAY_AGENT_TYPE = env("BYAI_SEND_ANYWAY_AGENT_TYPE",
@@ -34,18 +33,18 @@ public class SendMessageRoutePolicyExample {
                 // 2. 创建 ByaiGatewayClient。
                 ByaiGatewayClient client = new ByaiGatewayClient(redisClient);
 
-                // 3. 依次使用四种 RoutePolicy 发送消息。
+                // 3. 使用不同路由策略发送消息。
                 sendWithPolicy(client, FAIL_FAST_AGENT_TYPE, USER_CODE, RoutePolicy.FAIL_FAST,
                                 "FAIL_FAST: 只有在线 Worker 存在时才会投递。");
 
                 sendWithPolicy(client, WAKE_AND_WAIT_AGENT_TYPE, USER_CODE, RoutePolicy.WAKE_AND_WAIT,
-                                "如果当前没有在线 Worker，请先触发唤醒并等待可用后再投递。");
+                                "WAKE_AND_WAIT: 如果当前没有在线 Worker，请先触发唤醒并等待可用后再投递。");
 
                 sendWithPolicy(client, WAKE_AND_QUEUE_AGENT_TYPE, USER_CODE, RoutePolicy.WAKE_AND_QUEUE,
-                                "如果当前没有在线 Worker，请触发唤醒并先进入 pending delivery。");
+                                "WAKE_AND_QUEUE: 如果当前没有在线 Worker，请触发唤醒并先进入 pending delivery 队列。");
 
                 sendWithPolicy(client, SEND_ANYWAY_AGENT_TYPE, USER_CODE, RoutePolicy.SEND_ANYWAY,
-                                "跳过在线检查，直接写入目标 agent_type 控制队列。");
+                                "SEND_ANYWAY: 跳过在线检查，直接写入目标 agent_type 控制队列。");
 
                 // 4. 清理资源。
                 redisClient.close();
@@ -65,7 +64,7 @@ public class SendMessageRoutePolicyExample {
                 System.out.println("  target_agent_type: " + targetAgentType);
                 System.out.println("  content: " + content);
 
-                // 调用完整参数的 sendMessage，传入 route_policy 和 availability_timeout_ms。
+                // 调用 16 参数版本的 sendMessage，传入指定 routePolicy 和超时时间。
                 GatewayClient.SendResponse response = client.sendMessage(
                                 targetAgentType,
                                 sessionId,
@@ -79,10 +78,10 @@ public class SendMessageRoutePolicyExample {
                                 null, // payload
                                 null, // metadata
                                 null, // targetWorkerId
-                                routePolicy, // routePolicy
-                                10_000L, // availabilityTimeoutMs (10s)
+                                routePolicy,
+                                10000L, // availabilityTimeoutMs (10秒超时)
                                 null, // region
-                                null // priority
+                                null  // priority
                 );
 
                 // 打印结果。
@@ -100,11 +99,10 @@ public class SendMessageRoutePolicyExample {
                         System.out.println("  error_code:   " + response.getErrorCode());
                 }
 
-                // 特殊状态说明。
-                if (AvailabilityStatus.QUEUE_PENDING.equals(response.getStatus())) {
-                        System.out.println("  > 消息已进入 pending queue，等待 Worker 上线后投递。");
-                } else if (AvailabilityStatus.WAIT_AND_DELIVER.equals(response.getStatus())) {
-                        System.out.println("  > Worker 已唤醒，消息已投递。");
+                if (response.isSuccess()) {
+                        System.out.println("  > 消息投递处理结果：" + response.getStatus());
+                } else {
+                        System.out.println("  > 消息未投递，错误原因：" + response.getError());
                 }
         }
 

@@ -26,9 +26,9 @@ public class SendMessageExample {
         ByaiGatewayClient client = new ByaiGatewayClient(redisClient);
 
         // 3. 准备消息参数。
-        String targetAgentType = "pubsub-capability";
-        String sessionId = "session-demo-a-b-a";
-        String content = "你好，这是来自 Java SDK 拦截器模式的测试消息。";
+        String targetAgentType = "langgraph-extension-demo";
+        String sessionId = "session-demo-a-b-a12";
+        String content = "查一下广州的天气";
         String userCode = "user-1";
         String userName = "测试用户";
 
@@ -45,6 +45,8 @@ public class SendMessageExample {
         // 4. 发送消息。
         // 虽然 content 是 String，但 ByaiGatewayClient 也支持 BaiYingMessage 类型，
         // 拦截器会自动识别并处理转换。
+        // Java SDK 会自动生成 trace_id / trace_parent_span_id，并 best-effort 写入
+        // Redis trace meta、client.dispatch span 和 session/worker/agent 索引。
         GatewayClient.SendResponse response = client.sendMessage(
                 targetAgentType,
                 sessionId,
@@ -62,8 +64,10 @@ public class SendMessageExample {
         if (response.isSuccess()) {
             System.out.println("✅ 消息发送成功！");
             System.out.println("   Message ID: " + response.getMessageId());
+            System.out.println("   Trace ID: " + response.getTraceId());
             System.out.println("   Target Worker: " + response.getTargetWorkerId());
             System.out.println("   Status: " + response.getStatus());
+            System.out.println("   Trace Dashboard 可使用该 Trace ID 查询完整链路。");
         } else {
             System.err.println("❌ 消息发送失败！");
             System.err.println("   Error: " + response.getError());

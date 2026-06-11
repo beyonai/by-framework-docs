@@ -1,0 +1,14 @@
+[project]
+name = "trace-demo-worker"
+version = "0.1.0"
+description = "Trace demonstration worker showing manual and plugin-based APM context propagation"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "by-framework>=0.2.1",
+    "by-framework-trace-langfuse",
+    "langfuse>=4.3.1",
+    "python-dotenv>=1.0.0",
+    "opentelemetry-api>=1.25.0",
+    "opentelemetry-sdk>=1.25.0",
+]

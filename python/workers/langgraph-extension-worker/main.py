@@ -26,6 +26,10 @@ class ExtensionDemoWorker(LangGraphWorker):
         """定义此 Worker 提供的智能体类型。"""
         return ["langgraph-extension-demo"]
 
+    def get_thread_id(self, context) -> str:
+        """Use task-level checkpoints so a suspended tool call cannot leak into later prompts."""
+        return context.message_id or context.session_id
+
     def build_graph(self, context, command):
         """
         构建并返回编译后的 LangGraph。
@@ -58,6 +62,7 @@ class ExtensionDemoWorker(LangGraphWorker):
             api_key=os.getenv("OPENAI_API_KEY"),
             base_url=os.getenv("OPENAI_BASE_URL"),
             streaming=True,
+            stream_options={"include_usage": True},
         )
 
         # 4. 构建图
@@ -67,7 +72,13 @@ class ExtensionDemoWorker(LangGraphWorker):
             llm,
             tools=[weather_tool, ask_user_tool],
             checkpointer=self.get_checkpointer(),
-            prompt="你是一个由 by-framework赋能的 AI 助手。你可以查询天气或直接向用户提问。"
+            prompt=(
+                "你是一个由 by-framework 赋能的 AI 助手。\n"
+                "当用户询问天气时，最多调用一次 query_weather 工具。\n"
+                "一旦 query_weather 返回了天气结果，必须直接基于该结果整理最终回答，"
+                "不要再次调用 query_weather，也不要继续请求 weather-agent。\n"
+                "只有确实缺少必要信息时，才使用 ask_user_for_confirmation 向用户提问。"
+            )
         )
 
         return agent_graph
