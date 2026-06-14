@@ -28,6 +28,7 @@ members = [
     "python/workers/trace-demo-worker",
     "python/discovery",
     "python/plugins",
+    "python/manager"
 ]
 
 [tool.uv.sources]
