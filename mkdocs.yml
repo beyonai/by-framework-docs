@@ -71,6 +71,7 @@ nav:
       - guide/getting-started.md
       - guide/observability.md
       - guide/worker-guide.md
+      - guide/worker-management.md
       - guide/plugin-guide.md
       - guide/client-guide.md
       - guide/discovery-guide.md

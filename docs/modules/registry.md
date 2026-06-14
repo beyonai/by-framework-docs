@@ -116,7 +116,11 @@
 | Key | 类型 | 描述 |
 |-----|------|------|
 | `byai_gateway:registry:workers` | Set | 所有已知 Worker ID 集合 |
-| `byai_gateway:registry:worker:online:{worker_id}` | String | Worker 在线租约（TTL 15s） |
+| `byai_gateway:registry:worker:online:{worker_id}` | String | Worker 心跳租约，JSON 格式（含 ip_address / last_seen），TTL 15s |
 | `byai_gateway:registry:worker:lock:{worker_id}` | String | Worker 启动互斥锁（TTL 60s） |
 | `byai_gateway:registry:worker:agent_types:{worker_id}` | Set | Worker 声明的 Agent type 集合 |
 | `byai_gateway:registry:agent_type:workers:{agent_type}` | Set | Agent type 的成员 Worker 集合 |
+| `byai_gateway:registry:worker:admin:{worker_id}` | Hash | Worker 管控状态：`lifecycle` / `reason` / `updated_at`，由 WorkerManager 写入 |
+| `byai_gateway:registry:agent_type:denied:{agent_type}` | Set | 被禁止消费该 agent_type 的 Worker ID 集合 |
+| `by_framework:obs:collector_lock` | String | MetricsCollector 分布式锁（SET NX），TTL = interval × 3 |
+| `by_framework:obs:history` | ZSet | 历史趋势点，score = Unix ms，保留最近 2 小时 |
